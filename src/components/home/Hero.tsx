@@ -6,8 +6,18 @@ import { Box, Button, Typography } from "@mui/material";
 const Hero = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return;
     const video = videoRef.current;
     if (!video) return;
 
@@ -22,7 +32,7 @@ const Hero = () => {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [isMobile]);
 
   return (
     <Box
@@ -35,28 +45,30 @@ const Hero = () => {
       }}
       className="flex flex-col items-center justify-center text-center"
     >
-      {/* Background video */}
-      <video
-        ref={videoRef}
-        autoPlay
-        loop
-        muted
-        playsInline
-        poster="/video/home-bg.png"
-        onCanPlay={() => setVideoLoaded(true)}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          zIndex: 1,
-          opacity: videoLoaded ? 1 : 0,
-          transition: "opacity 0.8s ease-in",
-        }}
-      />
+      {/* Background video (hidden on mobile) */}
+      {!isMobile && (
+        <video
+          ref={videoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="/video/home-bg.png"
+          onCanPlay={() => setVideoLoaded(true)}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            zIndex: 1,
+            opacity: videoLoaded ? 1 : 0,
+            transition: "opacity 0.8s ease-in",
+          }}
+        />
+      )}
 
-      {/* Poster image fallback (shows instantly while video loads) */}
+      {/* Background image (always visible on mobile, fallback on desktop) */}
       <Box
         sx={{
           position: "absolute",
@@ -65,7 +77,7 @@ const Hero = () => {
           backgroundImage: "url(/video/home-bg.png)",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          opacity: videoLoaded ? 0 : 1,
+          opacity: isMobile ? 1 : videoLoaded ? 0 : 1,
           transition: "opacity 0.8s ease-in",
         }}
       />
