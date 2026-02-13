@@ -41,7 +41,7 @@ const Different = () => {
   return (
     <Box
       component="section"
-      sx={{ bgcolor: "primary.main" }}
+      sx={{ bgcolor: "#0A0B0D" }}
       className="py-24 px-4"
     >
       <Box className="max-w-6xl mx-auto">
@@ -50,7 +50,7 @@ const Different = () => {
           <Typography
             variant="overline"
             sx={{
-              color: "secondary.main",
+              color: "primary.main",
               fontWeight: 600,
               letterSpacing: "0.2em",
               fontSize: "0.9rem",
@@ -69,14 +69,14 @@ const Different = () => {
             }}
           >
             Why IndiceX is{" "}
-            <Box component="span" sx={{ color: "secondary.main" }}>
+            <Box component="span" sx={{ color: "primary.main" }}>
               Different
             </Box>
           </Typography>
 
           <Typography
             sx={{
-              color: "rgba(255,255,255,0.7)",
+              color: "rgba(255,255,255,0.6)",
               fontSize: "1.15rem",
               maxWidth: 640,
               mx: "auto",
@@ -94,17 +94,17 @@ const Different = () => {
             <Box
               key={item.title}
               sx={{
-                bgcolor: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.1)",
+                bgcolor: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.08)",
                 borderLeft: "4px solid",
-                borderLeftColor: "secondary.main",
+                borderLeftColor: "primary.main",
                 borderRadius: 3,
                 transition: "all 0.3s ease",
                 "&:hover": {
-                  bgcolor: "rgba(255,255,255,0.1)",
+                  bgcolor: "rgba(255,255,255,0.08)",
                   transform: "translateY(-4px)",
                   "& .diff-icon-box": {
-                    bgcolor: "secondary.main",
+                    bgcolor: "primary.main",
                     color: "#fff",
                   },
                 },
@@ -115,11 +115,11 @@ const Different = () => {
                 <Box
                   className="diff-icon-box flex items-center justify-center shrink-0"
                   sx={{
-                    bgcolor: "rgba(255,255,255,0.08)",
+                    bgcolor: "rgba(255,255,255,0.06)",
                     borderRadius: 2.5,
                     width: 52,
                     height: 52,
-                    color: "secondary.main",
+                    color: "primary.main",
                     transition: "all 0.3s ease",
                   }}
                 >
@@ -144,10 +144,10 @@ const Different = () => {
                     <Typography
                       component="span"
                       sx={{
-                        color: "rgba(255,255,255,0.5)",
+                        color: "rgba(255,255,255,0.45)",
                         fontSize: "0.85rem",
                         fontWeight: 600,
-                        bgcolor: "rgba(255,255,255,0.08)",
+                        bgcolor: "rgba(255,255,255,0.06)",
                         borderRadius: 1,
                         px: 1,
                         py: 0.25,
@@ -158,7 +158,7 @@ const Different = () => {
                     </Typography>
                     <Typography
                       sx={{
-                        color: "rgba(255,255,255,0.4)",
+                        color: "rgba(255,255,255,0.35)",
                         fontSize: "0.9rem",
                         lineHeight: 1.6,
                         textDecoration: "line-through",
@@ -173,10 +173,10 @@ const Different = () => {
                     <Typography
                       component="span"
                       sx={{
-                        color: "secondary.main",
+                        color: "primary.main",
                         fontSize: "0.85rem",
                         fontWeight: 600,
-                        bgcolor: "rgba(194, 150, 75, 0.15)",
+                        bgcolor: "rgba(31, 94, 228, 0.15)",
                         borderRadius: 1,
                         px: 1,
                         py: 0.25,
@@ -187,7 +187,7 @@ const Different = () => {
                     </Typography>
                     <Typography
                       sx={{
-                        color: "rgba(255,255,255,0.8)",
+                        color: "rgba(255,255,255,0.75)",
                         fontSize: "0.9rem",
                         lineHeight: 1.6,
                       }}

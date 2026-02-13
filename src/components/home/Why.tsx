@@ -8,25 +8,25 @@ import PublicIcon from "@mui/icons-material/Public";
 
 const features = [
   {
-    icon: <VerifiedIcon sx={{ fontSize: 36, color: "secondary.main" }} />,
+    icon: <VerifiedIcon sx={{ fontSize: 36, color: "primary.main" }} />,
     title: "Trusted Benchmarks",
     description:
       "Built on established, widely recognized market indices — not synthetic or unverified assets.",
   },
   {
-    icon: <VisibilityIcon sx={{ fontSize: 36, color: "secondary.main" }} />,
+    icon: <VisibilityIcon sx={{ fontSize: 36, color: "primary.main" }} />,
     title: "Fully Transparent",
     description:
       "Every transaction, rebalance, and holding is verifiable on-chain in real time.",
   },
   {
-    icon: <BoltIcon sx={{ fontSize: 36, color: "secondary.main" }} />,
+    icon: <BoltIcon sx={{ fontSize: 36, color: "primary.main" }} />,
     title: "Programmable Exposure",
     description:
       "Smart contract-driven index tokens that compose seamlessly with DeFi protocols.",
   },
   {
-    icon: <PublicIcon sx={{ fontSize: 36, color: "secondary.main" }} />,
+    icon: <PublicIcon sx={{ fontSize: 36, color: "primary.main" }} />,
     title: "Borderless Access",
     description:
       "Invest from anywhere using stablecoins — no banks, no intermediaries, no delays.",
@@ -37,7 +37,7 @@ const Why = () => {
   return (
     <Box
       component="section"
-      sx={{ bgcolor: "primary.main" }}
+      sx={{ bgcolor: "#0A0B0D" }}
       className="py-20 px-4"
     >
       <Box className="max-w-6xl mx-auto">
@@ -46,7 +46,7 @@ const Why = () => {
           <Typography
             variant="overline"
             sx={{
-              color: "secondary.main",
+              color: "primary.main",
               fontWeight: 600,
               letterSpacing: "0.2em",
               fontSize: "0.9rem",
@@ -65,14 +65,14 @@ const Why = () => {
             }}
           >
             Bridging Markets &{" "}
-            <Box component="span" sx={{ color: "secondary.main" }}>
+            <Box component="span" sx={{ color: "primary.main" }}>
               Blockchain
             </Box>
           </Typography>
 
           <Typography
             sx={{
-              color: "rgba(255,255,255,0.7)",
+              color: "rgba(255,255,255,0.6)",
               fontSize: "1.15rem",
               maxWidth: 640,
               mx: "auto",
@@ -91,13 +91,13 @@ const Why = () => {
             <Box
               key={feature.title}
               sx={{
-                bgcolor: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.1)",
+                bgcolor: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.08)",
                 borderRadius: 3,
                 transition: "all 0.3s ease",
                 "&:hover": {
-                  bgcolor: "rgba(255,255,255,0.1)",
-                  borderColor: "secondary.main",
+                  bgcolor: "rgba(255,255,255,0.08)",
+                  borderColor: "primary.main",
                   transform: "translateY(-4px)",
                 },
               }}
@@ -105,7 +105,7 @@ const Why = () => {
             >
               <Box
                 sx={{
-                  bgcolor: "rgba(255,255,255,0.08)",
+                  bgcolor: "rgba(255,255,255,0.06)",
                   borderRadius: 2,
                   width: 56,
                   height: 56,
@@ -129,7 +129,7 @@ const Why = () => {
 
               <Typography
                 sx={{
-                  color: "rgba(255,255,255,0.6)",
+                  color: "rgba(255,255,255,0.55)",
                   fontSize: "0.925rem",
                   lineHeight: 1.65,
                 }}

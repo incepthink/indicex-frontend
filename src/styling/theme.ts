@@ -5,38 +5,39 @@ import { createTheme } from "@mui/material/styles";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#344A86", // Chambray
+      main: "#1F5EE4", // Coinbase Blue
     },
     secondary: {
-      main: "#C2964B", // Tussock
+      main: "#0A0B0D", // Near Black
     },
     background: {
-      default: "#E1DDD6", // Silver Feather
+      default: "#EEF0F3", // Light Gray
       paper: "#FFFFFF",
     },
     text: {
-      primary: "#4B4945", // Charred
-      secondary: "#6B6862", // Warm Stone
+      primary: "#0A0B0D", // Near Black
+      secondary: "#5B616E", // Medium Gray
     },
     info: {
-      main: "#407794", // Harbour Blue
+      main: "#1F5EE4", // Coinbase Blue
     },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         contained: {
-          backgroundColor: "#344A86",
+          backgroundColor: "#0A0B0D",
+          color: "#FFFFFF",
           "&:hover": {
-            backgroundColor: "#2a3d6e",
+            backgroundColor: "#2A2A2D",
           },
         },
         outlined: {
-          borderColor: "#344A86",
-          color: "#344A86",
+          borderColor: "#0A0B0D",
+          color: "#0A0B0D",
           "&:hover": {
-            borderColor: "#2a3d6e",
-            backgroundColor: "rgba(52, 74, 134, 0.04)",
+            borderColor: "#2A2A2D",
+            backgroundColor: "rgba(10, 11, 13, 0.04)",
           },
         },
       },
@@ -44,7 +45,8 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: "#344A86",
+          backgroundColor: "#FFFFFF",
+          color: "#0A0B0D",
         },
       },
     },

@@ -52,9 +52,7 @@ const Navbar = () => {
         position="fixed"
         elevation={0}
         sx={{
-          transform: visible ? "translateY(0)" : "translateY(-100%)",
-          transition: "transform 0.3s ease-in-out",
-          boxShadow: "0 2px 12px rgba(0, 0, 0, 0.3)",
+          borderBottom: "1px solid rgba(0, 0, 0, 0.2)",
         }}
       >
         <Box
@@ -63,12 +61,12 @@ const Navbar = () => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "0.3rem 1rem",
+            padding: "0.45rem 1rem",
             marginInline: "auto",
             width: "100%",
           }}
         >
-          <Box sx={{ fontSize: "1.7rem", fontWeight: "bold" }}>
+          <Box sx={{ fontSize: "1.9rem", fontWeight: "bold" }}>
             <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>
               IndiceX
             </Link>
@@ -79,14 +77,16 @@ const Navbar = () => {
             sx={{
               display: { xs: "none", md: "flex" },
               gap: "4rem",
-              fontSize: "1.1rem",
+              fontSize: "1.2rem",
+              fontWeight: 500,
             }}
           >
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                style={{ color: "#fff", textDecoration: "none" }}
+                style={{ color: "#0A0B0D", textDecoration: "none" }}
+                className="hover:bg-[rgba(0,0,0,0.1)] p-3 px-5 rounded-full"
               >
                 {link.label}
               </Link>
@@ -116,8 +116,8 @@ const Navbar = () => {
         onClose={() => setMobileOpen(false)}
         PaperProps={{
           sx: {
-            backgroundColor: "primary.main",
-            color: "#fff",
+            backgroundColor: "#FFFFFF",
+            color: "#0A0B0D",
           },
         }}
       >

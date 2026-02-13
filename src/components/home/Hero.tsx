@@ -88,8 +88,8 @@ const Hero = () => {
           position: "absolute",
           inset: 0,
           zIndex: 2,
-          backgroundColor: "background.default",
-          opacity: 0.85,
+          backgroundColor: "#FFFFFF",
+          opacity: 0.65,
         }}
       />
 
@@ -101,12 +101,12 @@ const Hero = () => {
         <Typography
           variant="h2"
           sx={{
-            color: "secondary.main",
+            color: "primary.main",
             fontWeight: 600,
             letterSpacing: "0.15em",
             textTransform: "uppercase",
             mb: 2,
-            fontSize: { xs: "1.75rem", sm: "2.5rem", md: "3.5rem" },
+            fontSize: { xs: "1.85rem", sm: "2.7rem", md: "3.8rem" },
           }}
         >
           IndiceX
@@ -157,6 +157,10 @@ const Hero = () => {
               textTransform: "none",
               fontSize: "1.05rem",
               fontWeight: 600,
+              bgcolor: "primary.main",
+              "&:hover": {
+                bgcolor: "#1A4FBF",
+              },
             }}
           >
             Start Investing

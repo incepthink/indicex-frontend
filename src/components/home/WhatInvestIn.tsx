@@ -59,7 +59,7 @@ const WhatInvestIn = () => {
           <Typography
             variant="overline"
             sx={{
-              color: "secondary.main",
+              color: "primary.main",
               fontWeight: 600,
               letterSpacing: "0.2em",
               fontSize: "0.9rem",
@@ -130,14 +130,13 @@ const IndexCard = ({
     sx={{
       bgcolor: "background.paper",
       border: "1px solid",
-      borderColor: "rgba(75, 73, 69, 0.08)",
+      borderColor: "rgba(0, 0, 0, 0.08)",
       borderRadius: 3,
       transition: "all 0.3s ease",
-      // cursor: "pointer",
       "&:hover": {
-        borderColor: "secondary.main",
+        borderColor: "primary.main",
         transform: "translateY(-4px)",
-        boxShadow: "0 12px 32px rgba(52, 74, 134, 0.1)",
+        boxShadow: "0 12px 32px rgba(31, 94, 228, 0.1)",
         "& .card-arrow": {
           opacity: 1,
           transform: "translateX(0)",
@@ -154,7 +153,7 @@ const IndexCard = ({
       <Box
         className="card-icon-box flex items-center justify-center"
         sx={{
-          bgcolor: "rgba(52, 74, 134, 0.08)",
+          bgcolor: "rgba(31, 94, 228, 0.08)",
           borderRadius: 2.5,
           width: 56,
           height: 56,
@@ -168,8 +167,8 @@ const IndexCard = ({
         label={tag}
         size="small"
         sx={{
-          bgcolor: "rgba(194, 150, 75, 0.1)",
-          color: "secondary.main",
+          bgcolor: "rgba(31, 94, 228, 0.08)",
+          color: "primary.main",
           fontWeight: 600,
           fontSize: "0.75rem",
           height: 26,

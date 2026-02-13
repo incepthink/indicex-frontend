@@ -32,7 +32,7 @@ const ComplianceRiskDisclosurePage = () => {
           <Typography
             variant="overline"
             sx={{
-              color: "secondary.main",
+              color: "primary.main",
               fontWeight: 600,
               letterSpacing: "0.2em",
               fontSize: "0.9rem",
@@ -89,7 +89,7 @@ const ComplianceRiskDisclosurePage = () => {
                 }}
               >
                 <ListItemIcon sx={{ minWidth: 40 }}>
-                  <WarningAmberIcon sx={{ color: "secondary.main" }} />
+                  <WarningAmberIcon sx={{ color: "primary.main" }} />
                 </ListItemIcon>
                 <ListItemText
                   primary={text}

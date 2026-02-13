@@ -15,7 +15,7 @@ const Footer = () => {
   return (
     <Box
       component="footer"
-      sx={{ backgroundColor: "primary.main", color: "#fff", pt: 6, pb: 3 }}
+      sx={{ backgroundColor: "#0A0B0D", color: "#fff", pt: 6, pb: 3 }}
     >
       <Box maxWidth="xl" sx={{ px: 2, marginInline: "auto", width: "100%" }}>
         {/* Top section */}
@@ -35,7 +35,7 @@ const Footer = () => {
             </Typography>
             <Typography
               variant="body2"
-              sx={{ color: "rgba(255,255,255,0.7)", maxWidth: 300 }}
+              sx={{ color: "rgba(255,255,255,0.6)", maxWidth: 300 }}
             >
               Smart, diversified index investing — built for the modern
               investor.
@@ -53,7 +53,7 @@ const Footer = () => {
                   key={link.href}
                   href={link.href}
                   style={{
-                    color: "rgba(255,255,255,0.7)",
+                    color: "rgba(255,255,255,0.6)",
                     textDecoration: "none",
                   }}
                 >
@@ -73,7 +73,7 @@ const Footer = () => {
                 display: "flex",
                 flexDirection: "column",
                 gap: 1,
-                color: "rgba(255,255,255,0.7)",
+                color: "rgba(255,255,255,0.6)",
               }}
             >
               <Typography variant="body2">support@indicex.com</Typography>
@@ -85,7 +85,7 @@ const Footer = () => {
           </Box>
         </Box>
 
-        <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
+        <Divider sx={{ borderColor: "rgba(255,255,255,0.15)" }} />
 
         {/* Bottom section */}
         <Box
@@ -98,14 +98,14 @@ const Footer = () => {
             pt: 3,
           }}
         >
-          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)" }}>
+          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.6)" }}>
             &copy; {new Date().getFullYear()} IndiceX. All rights reserved.
           </Typography>
           <Box sx={{ display: "flex", gap: 3 }}>
             <a
               href="#"
               style={{
-                color: "rgba(255,255,255,0.7)",
+                color: "rgba(255,255,255,0.6)",
                 textDecoration: "none",
                 fontSize: "0.875rem",
               }}
@@ -115,7 +115,7 @@ const Footer = () => {
             <a
               href="#"
               style={{
-                color: "rgba(255,255,255,0.7)",
+                color: "rgba(255,255,255,0.6)",
                 textDecoration: "none",
                 fontSize: "0.875rem",
               }}

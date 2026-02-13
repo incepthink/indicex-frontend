@@ -6,7 +6,7 @@ const Mission = () => {
   return (
     <Box
       component="section"
-      sx={{ bgcolor: "primary.main" }}
+      sx={{ bgcolor: "#0A0B0D" }}
       className="py-24 px-4"
     >
       <Box className="max-w-5xl mx-auto">
@@ -16,7 +16,7 @@ const Mission = () => {
             <Typography
               variant="overline"
               sx={{
-                color: "secondary.main",
+                color: "primary.main",
                 fontWeight: 600,
                 letterSpacing: "0.2em",
                 fontSize: "0.9rem",
@@ -35,7 +35,7 @@ const Mission = () => {
               }}
             >
               Bridging Traditional Markets &{" "}
-              <Box component="span" sx={{ color: "secondary.main" }}>
+              <Box component="span" sx={{ color: "primary.main" }}>
                 Blockchain Finance
               </Box>
             </Typography>
@@ -45,7 +45,7 @@ const Mission = () => {
           <Box>
             <Typography
               sx={{
-                color: "rgba(255,255,255,0.75)",
+                color: "rgba(255,255,255,0.65)",
                 fontSize: "1.1rem",
                 lineHeight: 1.8,
                 mb: 3,
@@ -58,7 +58,7 @@ const Mission = () => {
 
             <Typography
               sx={{
-                color: "rgba(255,255,255,0.75)",
+                color: "rgba(255,255,255,0.65)",
                 fontSize: "1.1rem",
                 lineHeight: 1.8,
               }}

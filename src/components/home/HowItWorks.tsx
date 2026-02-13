@@ -43,7 +43,7 @@ const HowItWorks = () => {
   return (
     <Box
       component="section"
-      sx={{ bgcolor: "primary.main" }}
+      sx={{ bgcolor: "#0A0B0D" }}
       className="py-20 px-4"
     >
       <Box className="max-w-6xl mx-auto w-full">
@@ -52,7 +52,7 @@ const HowItWorks = () => {
           <Typography
             variant="overline"
             sx={{
-              color: "secondary.main",
+              color: "primary.main",
               fontWeight: 600,
               letterSpacing: "0.2em",
               fontSize: "0.9rem",
@@ -71,14 +71,14 @@ const HowItWorks = () => {
             }}
           >
             Four Simple{" "}
-            <Box component="span" sx={{ color: "secondary.main" }}>
+            <Box component="span" sx={{ color: "primary.main" }}>
               Steps
             </Box>
           </Typography>
 
           <Typography
             sx={{
-              color: "rgba(255,255,255,0.7)",
+              color: "rgba(255,255,255,0.6)",
               fontSize: "1.15rem",
               maxWidth: 580,
               mx: "auto",
@@ -101,11 +101,11 @@ const HowItWorks = () => {
               >
                 <Box
                   sx={{
-                    bgcolor: "rgba(255,255,255,0.15)",
+                    bgcolor: "rgba(255,255,255,0.1)",
                     width: 72,
                     height: 72,
                     borderRadius: "50%",
-                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.3)",
                     position: "relative",
                   }}
                   className="flex items-center justify-center mb-5"
@@ -116,7 +116,7 @@ const HowItWorks = () => {
                       position: "absolute",
                       top: -8,
                       right: -8,
-                      bgcolor: "secondary.main",
+                      bgcolor: "primary.main",
                       color: "#fff",
                       width: 28,
                       height: 28,
@@ -144,7 +144,7 @@ const HowItWorks = () => {
 
                 <Typography
                   sx={{
-                    color: "rgba(255,255,255,0.65)",
+                    color: "rgba(255,255,255,0.55)",
                     fontSize: "0.925rem",
                     lineHeight: 1.65,
                     maxWidth: 240,
@@ -158,14 +158,14 @@ const HowItWorks = () => {
               {/* Horizontal Arrow */}
               {index < steps.length - 1 && (
                 <Box
-                  sx={{ color: "secondary.main", mt: "26px" }}
+                  sx={{ color: "primary.main", mt: "26px" }}
                   className="flex items-center px-3 shrink-0"
                 >
                   <Box
                     sx={{
                       height: 2,
                       width: 32,
-                      bgcolor: "secondary.main",
+                      bgcolor: "primary.main",
                       opacity: 0.9,
                       borderRadius: 1,
                     }}
@@ -185,11 +185,11 @@ const HowItWorks = () => {
               <Box className="flex flex-col items-center text-center">
                 <Box
                   sx={{
-                    bgcolor: "rgba(255,255,255,0.15)",
+                    bgcolor: "rgba(255,255,255,0.1)",
                     width: 72,
                     height: 72,
                     borderRadius: "50%",
-                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.3)",
                     position: "relative",
                   }}
                   className="flex items-center justify-center mb-5"
@@ -200,7 +200,7 @@ const HowItWorks = () => {
                       position: "absolute",
                       top: -8,
                       right: -8,
-                      bgcolor: "secondary.main",
+                      bgcolor: "primary.main",
                       color: "#fff",
                       width: 28,
                       height: 28,
@@ -228,7 +228,7 @@ const HowItWorks = () => {
 
                 <Typography
                   sx={{
-                    color: "rgba(255,255,255,0.65)",
+                    color: "rgba(255,255,255,0.55)",
                     fontSize: "0.925rem",
                     lineHeight: 1.65,
                     maxWidth: 240,
@@ -242,7 +242,7 @@ const HowItWorks = () => {
               {/* Vertical Arrow */}
               {index < steps.length - 1 && (
                 <Box
-                  sx={{ color: "secondary.main" }}
+                  sx={{ color: "primary.main" }}
                   className="flex justify-center py-6"
                 >
                   <Box className="flex flex-col items-center">
@@ -250,7 +250,7 @@ const HowItWorks = () => {
                       sx={{
                         width: 2,
                         height: 24,
-                        bgcolor: "secondary.main",
+                        bgcolor: "primary.main",
                         opacity: 0.9,
                         borderRadius: 1,
                       }}

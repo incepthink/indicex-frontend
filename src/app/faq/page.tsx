@@ -57,7 +57,7 @@ const FAQPage = () => {
           <Typography
             variant="overline"
             sx={{
-              color: "secondary.main",
+              color: "primary.main",
               fontWeight: 600,
               letterSpacing: "0.2em",
               fontSize: "0.9rem",
@@ -118,7 +118,7 @@ const FAQPage = () => {
                 borderColor:
                   expanded === index
                     ? "primary.main"
-                    : "rgba(75, 73, 69, 0.12)",
+                    : "rgba(0, 0, 0, 0.08)",
                 transition: "border-color 0.3s ease",
                 "&::before": { display: "none" },
                 overflow: "hidden",

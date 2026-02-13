@@ -7,14 +7,14 @@ const Final = () => {
   return (
     <Box
       component="section"
-      sx={{ bgcolor: "primary.main" }}
+      sx={{ bgcolor: "#0A0B0D" }}
       className="py-24 px-4"
     >
       <Box className="max-w-3xl mx-auto text-center">
         <Typography
           variant="overline"
           sx={{
-            color: "secondary.main",
+            color: "primary.main",
             fontWeight: 600,
             letterSpacing: "0.2em",
             fontSize: "0.9rem",
@@ -34,14 +34,14 @@ const Final = () => {
           }}
         >
           The Future of Index Investing is{" "}
-          <Box component="span" sx={{ color: "secondary.main" }}>
+          <Box component="span" sx={{ color: "primary.main" }}>
             On-Chain
           </Box>
         </Typography>
 
         <Typography
           sx={{
-            color: "rgba(255, 255, 255, 0.75)",
+            color: "rgba(255, 255, 255, 0.6)",
             fontSize: "1.15rem",
             maxWidth: 540,
             mx: "auto",
@@ -58,7 +58,7 @@ const Final = () => {
           size="large"
           endIcon={<ArrowForwardIcon />}
           sx={{
-            bgcolor: "secondary.main",
+            bgcolor: "primary.main",
             color: "#FFFFFF",
             px: 5,
             py: 1.75,
@@ -67,7 +67,7 @@ const Final = () => {
             fontSize: "1.1rem",
             fontWeight: 600,
             "&:hover": {
-              bgcolor: "#b3873f",
+              bgcolor: "#1A4FBF",
             },
           }}
         >

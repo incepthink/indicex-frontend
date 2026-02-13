@@ -7,19 +7,19 @@ import PersonIcon from "@mui/icons-material/Person";
 
 const values = [
   {
-    icon: <HandshakeIcon sx={{ fontSize: 32, color: "secondary.main" }} />,
+    icon: <HandshakeIcon sx={{ fontSize: 32, color: "primary.main" }} />,
     title: "Trust",
     description:
       "Built on established market benchmarks and auditable smart contracts — never a black box.",
   },
   {
-    icon: <LockOpenIcon sx={{ fontSize: 32, color: "secondary.main" }} />,
+    icon: <LockOpenIcon sx={{ fontSize: 32, color: "primary.main" }} />,
     title: "Openness",
     description:
       "Open methodologies, open data, and open-source infrastructure. Transparency is our default.",
   },
   {
-    icon: <PersonIcon sx={{ fontSize: 32, color: "secondary.main" }} />,
+    icon: <PersonIcon sx={{ fontSize: 32, color: "primary.main" }} />,
     title: "Investor-First",
     description:
       "Every decision we make prioritizes the interests of our investors — fair access, low fees, no hidden agendas.",
@@ -30,7 +30,7 @@ const Values = () => {
   return (
     <Box
       component="section"
-      sx={{ bgcolor: "primary.main" }}
+      sx={{ bgcolor: "#0A0B0D" }}
       className="py-24 px-4"
     >
       <Box className="max-w-6xl mx-auto">
@@ -38,7 +38,7 @@ const Values = () => {
           <Typography
             variant="overline"
             sx={{
-              color: "secondary.main",
+              color: "primary.main",
               fontWeight: 600,
               letterSpacing: "0.2em",
               fontSize: "0.9rem",
@@ -57,14 +57,14 @@ const Values = () => {
             }}
           >
             What We{" "}
-            <Box component="span" sx={{ color: "secondary.main" }}>
+            <Box component="span" sx={{ color: "primary.main" }}>
               Stand For
             </Box>
           </Typography>
 
           <Typography
             sx={{
-              color: "rgba(255,255,255,0.7)",
+              color: "rgba(255,255,255,0.6)",
               fontSize: "1.15rem",
               maxWidth: 600,
               mx: "auto",
@@ -81,14 +81,14 @@ const Values = () => {
             <Box
               key={value.title}
               sx={{
-                bgcolor: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.1)",
+                bgcolor: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.08)",
                 borderRadius: 3,
                 transition: "all 0.3s ease",
                 textAlign: "center",
                 "&:hover": {
-                  bgcolor: "rgba(255,255,255,0.1)",
-                  borderColor: "secondary.main",
+                  bgcolor: "rgba(255,255,255,0.08)",
+                  borderColor: "primary.main",
                   transform: "translateY(-4px)",
                 },
               }}
@@ -97,7 +97,7 @@ const Values = () => {
               <Box
                 className="flex items-center justify-center mx-auto mb-5"
                 sx={{
-                  bgcolor: "rgba(194, 150, 75, 0.15)",
+                  bgcolor: "rgba(31, 94, 228, 0.15)",
                   borderRadius: "50%",
                   width: 64,
                   height: 64,
@@ -120,7 +120,7 @@ const Values = () => {
 
               <Typography
                 sx={{
-                  color: "rgba(255,255,255,0.65)",
+                  color: "rgba(255,255,255,0.55)",
                   fontSize: "0.95rem",
                   lineHeight: 1.7,
                 }}

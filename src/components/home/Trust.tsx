@@ -8,7 +8,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 
 const pillars = [
   {
-    icon: <DescriptionIcon sx={{ fontSize: 32, color: "secondary.main" }} />,
+    icon: <DescriptionIcon sx={{ fontSize: 32, color: "primary.main" }} />,
     title: "Public Contracts",
     description:
       "All smart contracts are open-source and deployed on public blockchains — anyone can audit the code that governs your assets.",
@@ -16,7 +16,7 @@ const pillars = [
   {
     icon: (
       <AccountBalanceWalletIcon
-        sx={{ fontSize: 32, color: "secondary.main" }}
+        sx={{ fontSize: 32, color: "primary.main" }}
       />
     ),
     title: "Verifiable Holdings",
@@ -24,13 +24,13 @@ const pillars = [
       "Every asset backing an index token is verifiable on-chain in real time. No hidden reserves, no trust assumptions.",
   },
   {
-    icon: <PriceCheckIcon sx={{ fontSize: 32, color: "secondary.main" }} />,
+    icon: <PriceCheckIcon sx={{ fontSize: 32, color: "primary.main" }} />,
     title: "Transparent Pricing",
     description:
       "Index prices are derived from on-chain oracle feeds — no opaque markups, no hidden spreads, no surprises.",
   },
   {
-    icon: <MenuBookIcon sx={{ fontSize: 32, color: "secondary.main" }} />,
+    icon: <MenuBookIcon sx={{ fontSize: 32, color: "primary.main" }} />,
     title: "Published Rules",
     description:
       "Rebalancing criteria, inclusion rules, and methodology are publicly documented and enforced by smart contracts.",
@@ -50,7 +50,7 @@ const Trust = () => {
           <Typography
             variant="overline"
             sx={{
-              color: "secondary.main",
+              color: "primary.main",
               fontWeight: 600,
               letterSpacing: "0.2em",
               fontSize: "0.9rem",
@@ -97,18 +97,18 @@ const Trust = () => {
                 bgcolor: "background.paper",
                 borderRadius: 3,
                 borderTop: "3px solid",
-                borderColor: "secondary.main",
+                borderColor: "primary.main",
                 transition: "all 0.3s ease",
                 "&:hover": {
                   transform: "translateY(-4px)",
-                  boxShadow: "0 12px 32px rgba(52, 74, 134, 0.12)",
+                  boxShadow: "0 12px 32px rgba(31, 94, 228, 0.12)",
                 },
               }}
               className="p-6"
             >
               <Box
                 sx={{
-                  bgcolor: "rgba(52, 74, 134, 0.06)",
+                  bgcolor: "rgba(31, 94, 228, 0.06)",
                   borderRadius: 2,
                   width: 56,
                   height: 56,

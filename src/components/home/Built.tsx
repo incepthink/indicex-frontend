@@ -53,7 +53,7 @@ const Built = () => {
           <Typography
             variant="overline"
             sx={{
-              color: "secondary.main",
+              color: "primary.main",
               fontWeight: 600,
               letterSpacing: "0.2em",
               fontSize: "0.9rem",
@@ -124,12 +124,12 @@ const FeatureCard = ({
       bgcolor: "background.paper",
       borderRadius: 3,
       border: "1px solid",
-      borderColor: "rgba(75, 73, 69, 0.06)",
+      borderColor: "rgba(0, 0, 0, 0.06)",
       transition: "all 0.3s ease",
       "&:hover": {
-        borderColor: "secondary.main",
+        borderColor: "primary.main",
         transform: "translateY(-4px)",
-        boxShadow: "0 12px 32px rgba(52, 74, 134, 0.08)",
+        boxShadow: "0 12px 32px rgba(31, 94, 228, 0.08)",
         "& .feature-icon-box": {
           bgcolor: "primary.main",
           color: "#fff",
@@ -141,7 +141,7 @@ const FeatureCard = ({
     <Box
       className="feature-icon-box flex items-center justify-center mb-4"
       sx={{
-        bgcolor: "rgba(52, 74, 134, 0.08)",
+        bgcolor: "rgba(31, 94, 228, 0.08)",
         borderRadius: 2.5,
         width: 52,
         height: 52,
