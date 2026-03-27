@@ -38,7 +38,7 @@ const Why = () => {
     <Box
       component="section"
       sx={{ bgcolor: "#0A0B0D" }}
-      className="py-20 px-4"
+      className="py-20 px-4 h-screen flex flex-col items-center justify-center"
     >
       <Box className="max-w-6xl mx-auto">
         {/* Section Header */}

@@ -45,7 +45,7 @@ export const vaults: Vault[] = [
   {
     id: "sp500",
     abbr: "SP",
-    name: "S&P 500 Index Vault",
+    name: "HashCase NIFTY FIFTY",
     description:
       "Tracks the S&P 500 — broad exposure to 500 of the largest U.S. companies. The benchmark for the American market.",
     category: "Large Cap",
@@ -142,7 +142,7 @@ export const vaults: Vault[] = [
   {
     id: "nasdaq100",
     abbr: "NQ",
-    name: "NASDAQ 100 Vault",
+    name: "Blackrock Vault",
     description:
       "Tracks the NASDAQ-100 — 100 of the largest non-financial companies on Nasdaq, dominated by global tech leaders.",
     category: "Large Cap",
@@ -211,7 +211,7 @@ export const vaults: Vault[] = [
   {
     id: "djia",
     abbr: "DJ",
-    name: "Dow Jones 30 Vault",
+    name: "Vanguard Vault",
     description:
       "Tracks the DJIA — 30 iconic blue-chip U.S. companies. The oldest and most recognized U.S. market benchmark.",
     category: "Large Cap",

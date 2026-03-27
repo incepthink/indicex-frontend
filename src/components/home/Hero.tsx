@@ -2,6 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
+import { keyframes } from "@mui/system";
+
+const pulseGlow = keyframes`
+  0%   { box-shadow: 0 0 0px rgba(31, 94, 228, 0); }
+  50%  { box-shadow: 0 0 20px rgba(31, 94, 228, 0.5); }
+  100% { box-shadow: 0 0 0px rgba(31, 94, 228, 0); }
+`;
 
 const Hero = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -89,13 +96,23 @@ const Hero = () => {
           inset: 0,
           zIndex: 2,
           backgroundColor: "#FFFFFF",
-          opacity: 0.65,
+          opacity: 0.35,
         }}
       />
 
       {/* Content */}
       <Box
-        sx={{ position: "relative", zIndex: 3 }}
+        sx={{
+          position: "relative",
+          zIndex: 3,
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          backgroundColor: "rgba(255, 255, 255, 0.6)",
+          borderRadius: 4,
+          px: { xs: 3, sm: 6, md: 8 },
+          py: { xs: 4, sm: 6 },
+          boxShadow: "0 4px 32px rgba(0,0,0,0.08)",
+        }}
         className="flex flex-col items-center"
       >
         <Typography
@@ -133,8 +150,8 @@ const Hero = () => {
         <Typography
           variant="h6"
           sx={{
-            color: "text.secondary",
-            fontWeight: 400,
+            color: "text.primary",
+            fontWeight: 500,
             maxWidth: 600,
             lineHeight: 1.6,
             mb: 5,
@@ -158,8 +175,16 @@ const Hero = () => {
               fontSize: "1.05rem",
               fontWeight: 600,
               bgcolor: "primary.main",
+              animation: `${pulseGlow} 2.4s ease-in-out infinite`,
+              transition: "transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease",
               "&:hover": {
                 bgcolor: "#1A4FBF",
+                transform: "scale(1.04)",
+                boxShadow: "0 6px 24px rgba(31,94,228,0.45)",
+                animation: "none",
+              },
+              "&:active": {
+                transform: "scale(0.97)",
               },
             }}
           >
@@ -175,6 +200,31 @@ const Hero = () => {
               textTransform: "none",
               fontSize: "1.05rem",
               fontWeight: 600,
+              borderColor: "currentColor",
+              transition: "all 0.2s ease",
+              position: "relative",
+              overflow: "hidden",
+              "&::after": {
+                content: '"→"',
+                position: "absolute",
+                right: 14,
+                opacity: 0,
+                transform: "translateX(-6px)",
+                transition: "opacity 0.2s ease, transform 0.2s ease",
+              },
+              "&:hover": {
+                borderColor: "primary.main",
+                color: "primary.main",
+                transform: "scale(1.03)",
+                pr: 5.5,
+                "&::after": {
+                  opacity: 1,
+                  transform: "translateX(0)",
+                },
+              },
+              "&:active": {
+                transform: "scale(0.97)",
+              },
             }}
           >
             Explore Indices

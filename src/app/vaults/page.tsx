@@ -55,7 +55,7 @@ export default function VaultsPage() {
   return (
     <div className="min-h-screen b">
       {/* Hero */}
-      <section className="bg-card border-b border-border py-14 text-center">
+      <section className=" border-b border-border py-14 text-center">
         {/* <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase mb-3">
           IndiceX VAULTS
         </p> */}

@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -77,7 +78,7 @@ const Navbar = () => {
           <Box
             sx={{
               display: { xs: "none", md: "flex" },
-              gap: "4rem",
+              gap: "1rem",
               fontSize: "1.2rem",
               fontWeight: 500,
             }}
@@ -92,6 +93,31 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
+          </Box>
+
+          {/* Connect wallet button — hidden below md */}
+          <Box sx={{ display: { xs: "none", md: "flex" } }}>
+            <ConnectButton.Custom>
+              {({
+                account,
+                chain,
+                openConnectModal,
+                openChainModal,
+                mounted,
+              }) => {
+                const connected = mounted && account && chain;
+                return (
+                  <button
+                    onClick={connected ? openChainModal : openConnectModal}
+                    className="px-4 py-2 rounded-full bg-primary text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+                  >
+                    {connected
+                      ? `${account.address.slice(0, 6)}...${account.address.slice(-4)}`
+                      : "Connect Wallet"}
+                  </button>
+                );
+              }}
+            </ConnectButton.Custom>
           </Box>
 
           {/* Mobile hamburger button — hidden at md and above via CSS */}
@@ -164,6 +190,29 @@ const Navbar = () => {
             </ListItem>
           ))}
         </List>
+        <Box sx={{ p: 2 }}>
+          <ConnectButton.Custom>
+            {({
+              account,
+              chain,
+              openConnectModal,
+              openChainModal,
+              mounted,
+            }) => {
+              const connected = mounted && account && chain;
+              return (
+                <button
+                  onClick={connected ? openChainModal : openConnectModal}
+                  className="px-4 py-2 rounded-full bg-primary text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+                >
+                  {connected
+                    ? `${account.address.slice(0, 6)}...${account.address.slice(-4)}`
+                    : "Connect Wallet"}
+                </button>
+              );
+            }}
+          </ConnectButton.Custom>
+        </Box>
       </Drawer>
     </>
   );

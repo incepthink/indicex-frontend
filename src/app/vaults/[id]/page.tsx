@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useParams, useRouter } from "next/navigation";
 import {
   AreaChart,
@@ -17,8 +19,16 @@ import {
   ShieldCheck,
   RefreshCw,
   ChevronDown,
+  CheckCircle,
 } from "lucide-react";
 import { vaults, formatTvl, formatReturn, formatNav } from "@/data/vaults";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const chartTabs = ["NAV Price", "Vault Balance", "30D Return"] as const;
 const timeRanges = ["7D", "30D", "90D", "1Y"] as const;
@@ -70,11 +80,23 @@ export default function VaultDetailPage() {
     useState<(typeof chartTabs)[number]>("NAV Price");
   const [timeRange, setTimeRange] =
     useState<(typeof timeRanges)[number]>("30D");
+  const { isConnected, address } = useAccount();
+
   const [depositWithdraw, setDepositWithdraw] = useState<
     "deposit" | "withdraw"
   >("deposit");
   const [depositAmount, setDepositAmount] = useState("");
   const [selectedToken, setSelectedToken] = useState("USDC");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  function handleTransaction() {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setShowSuccess(true);
+    }, 2000);
+  }
 
   const chartData = useMemo(
     () => (vault ? generateChartData(vault.nav, timeRange) : []),
@@ -536,9 +558,11 @@ export default function VaultDetailPage() {
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-1.5">
-                {depositWithdraw === "deposit"
-                  ? `Balance: 10,000 ${selectedToken}`
-                  : `Balance: 0 ind${vault.abbr} tokens`}
+                {!isConnected
+                  ? "Connect wallet to see balance"
+                  : depositWithdraw === "deposit"
+                    ? `Balance: 10,000 ${selectedToken}`
+                    : `Balance: 0 ind${vault.abbr} tokens`}
               </p>
 
               <div className="flex gap-2 mt-3">
@@ -591,16 +615,62 @@ export default function VaultDetailPage() {
                 )}
               </div>
 
-              <button
-                onClick={() => alert("This requires wallet connection")}
-                className={`mt-4 w-full py-3 rounded-lg font-semibold text-sm transition-opacity duration-150 hover:opacity-90 ${
-                  depositWithdraw === "deposit"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-black text-card"
-                }`}
-              >
-                {depositWithdraw === "deposit" ? "Deposit" : "Withdraw"}
-              </button>
+              {isConnected ? (
+                <button
+                  onClick={handleTransaction}
+                  disabled={isLoading || parsedAmount <= 0}
+                  className={`mt-4 w-full py-3 rounded-lg font-semibold text-sm transition-opacity duration-150 hover:opacity-90 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
+                    depositWithdraw === "deposit"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-black text-card"
+                  }`}
+                >
+                  {isLoading ? (
+                    <>
+                      <svg
+                        className="animate-spin h-4 w-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        />
+                      </svg>
+                      Processing...
+                    </>
+                  ) : depositWithdraw === "deposit" ? (
+                    "Deposit"
+                  ) : (
+                    "Withdraw"
+                  )}
+                </button>
+              ) : (
+                <ConnectButton.Custom>
+                  {({ openConnectModal }) => (
+                    <button
+                      onClick={openConnectModal}
+                      className={`mt-4 w-full py-3 rounded-lg font-semibold text-sm transition-opacity duration-150 hover:opacity-90 ${
+                        depositWithdraw === "deposit"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-black text-card"
+                      }`}
+                    >
+                      Connect Wallet
+                    </button>
+                  )}
+                </ConnectButton.Custom>
+              )}
               <p className="text-xs text-center text-muted-foreground mt-2">
                 Smart contract audited. Funds deployed on-chain.
               </p>
@@ -610,18 +680,43 @@ export default function VaultDetailPage() {
           {/* Your Position */}
           <div className="bg-card border border-border rounded-xl p-5">
             <h3 className="font-semibold text-black mb-4">Your Position</h3>
-            <div className="py-5 flex flex-col items-center">
-              <Wallet size={28} className="text-muted-foreground/40 mb-2" />
-              <p className="text-sm text-muted-foreground text-center">
-                Connect your wallet to view your position
-              </p>
-              <button
-                onClick={() => alert("This requires wallet connection")}
-                className="mt-3 border border-primary text-primary rounded-lg px-4 py-2 text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition-all duration-150"
-              >
-                Connect Wallet
-              </button>
-            </div>
+            {isConnected && address ? (
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Wallet</span>
+                  <span className="font-mono text-xs text-black">
+                    {address.slice(0, 6)}...{address.slice(-4)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">
+                    ind{vault.abbr} Balance
+                  </span>
+                  <span className="font-semibold text-black">0.0000</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Value (USD)</span>
+                  <span className="font-semibold text-black">$0.00</span>
+                </div>
+              </div>
+            ) : (
+              <div className="py-5 flex flex-col items-center w-full">
+                <Wallet size={28} className="text-muted-foreground/40 mb-2" />
+                <p className="text-sm text-muted-foreground text-center">
+                  Connect your wallet to view your position
+                </p>
+                <ConnectButton.Custom>
+                  {({ openConnectModal }) => (
+                    <button
+                      onClick={openConnectModal}
+                      className="mt-3 w-full py-2.5 rounded-lg font-semibold text-sm bg-primary text-primary-foreground transition-opacity duration-150 hover:opacity-90"
+                    >
+                      Connect Wallet
+                    </button>
+                  )}
+                </ConnectButton.Custom>
+              </div>
+            )}
           </div>
 
           {/* Vault Health */}
@@ -662,6 +757,35 @@ export default function VaultDetailPage() {
           </div> */}
         </div>
       </div>
+
+      {/* Success Modal */}
+      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+        <DialogContent className="sm:max-w-sm text-center bg-white">
+          <div className="flex flex-col items-center gap-4 py-4">
+            <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center">
+              <CheckCircle size={48} className="text-success" strokeWidth={1.5} />
+            </div>
+            <DialogHeader className="items-center space-y-1">
+              <DialogTitle className="text-xl font-bold text-black">
+                Transaction Successful
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground text-center">
+                {depositWithdraw === "deposit"
+                  ? `Your deposit of ${parsedAmount > 0 ? `$${parsedAmount.toLocaleString()}` : "funds"} ${selectedToken} was submitted successfully.`
+                  : `Your withdrawal of ${parsedAmount > 0 ? `${parsedAmount} ind${vault.abbr}` : "tokens"} was submitted successfully.`}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="w-full pt-2">
+              <button
+                onClick={() => setShowSuccess(false)}
+                className="w-full py-2.5 rounded-lg font-semibold text-sm bg-primary text-primary-foreground transition-opacity duration-150 hover:opacity-90"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
