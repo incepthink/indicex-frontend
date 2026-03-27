@@ -96,7 +96,7 @@ const Hero = () => {
           inset: 0,
           zIndex: 2,
           backgroundColor: "#FFFFFF",
-          opacity: 0.35,
+          opacity: 0.1,
         }}
       />
 
@@ -176,7 +176,8 @@ const Hero = () => {
               fontWeight: 600,
               bgcolor: "primary.main",
               animation: `${pulseGlow} 2.4s ease-in-out infinite`,
-              transition: "transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease",
+              transition:
+                "transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease",
               "&:hover": {
                 bgcolor: "#1A4FBF",
                 transform: "scale(1.04)",
