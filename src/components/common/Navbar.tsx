@@ -19,6 +19,7 @@ import React, { useEffect, useRef, useState } from "react";
 const navLinks = [
   { label: "About", href: "/about" },
   { label: "Vaults", href: "/vaults" },
+  { label: "Perps", href: "/perp" },
   {
     label: "Compliance & Risk Disclosure",
     href: "/compliance-risk-disclosure",
