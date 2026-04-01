@@ -1,150 +1,97 @@
 "use client";
 
-import { Box, Typography } from "@mui/material";
-import TokenIcon from "@mui/icons-material/Token";
-import ShowChartIcon from "@mui/icons-material/ShowChart";
-import AutorenewIcon from "@mui/icons-material/Autorenew";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import { motion } from "framer-motion";
+import {
+  Shield,
+  BarChart3,
+  Zap,
+  Eye,
+  DollarSign,
+  RefreshCw,
+} from "lucide-react";
 
-const platformFeatures = [
+const features = [
   {
-    icon: <TokenIcon sx={{ fontSize: 28 }} />,
-    title: "Tokenized Indices",
+    icon: Shield,
+    title: "Non-Custodial",
     description:
-      "Own diversified market exposure through on-chain index tokens — fractionalized, liquid, and composable with DeFi.",
+      "Your assets remain in your wallet at all times. No intermediaries, no counterparty risk.",
   },
   {
-    icon: <ShowChartIcon sx={{ fontSize: 28 }} />,
-    title: "Real-Time NAV",
+    icon: BarChart3,
+    title: "Diversified Exposure",
     description:
-      "Track net asset value in real time using institutional-grade oracle feeds — no end-of-day surprises.",
+      "Access broad market indices spanning equities, commodities, and crypto — all from one protocol.",
   },
   {
-    icon: <AutorenewIcon sx={{ fontSize: 28 }} />,
-    title: "Automated Rebalancing",
+    icon: Zap,
+    title: "Instant Settlement",
     description:
-      "Smart contracts handle periodic portfolio rebalancing automatically, keeping allocations aligned without manual intervention.",
+      "On-chain execution means trades settle in seconds, not days. No clearing houses required.",
   },
   {
-    icon: <VisibilityIcon sx={{ fontSize: 28 }} />,
+    icon: Eye,
     title: "On-Chain Transparency",
     description:
-      "Every transaction, rebalance, and holding is verifiable on the blockchain — fully auditable by anyone, anytime.",
+      "Every rebalance, fee, and allocation is verifiable on-chain. Full auditability by default.",
+  },
+  {
+    icon: DollarSign,
+    title: "Stablecoin-Native",
+    description:
+      "Deposit and withdraw in USDC. No need to bridge between volatile assets to participate.",
+  },
+  {
+    icon: RefreshCw,
+    title: "Real-Time Rebalancing",
+    description:
+      "Automated portfolio rebalancing keeps your exposure aligned with target allocations continuously.",
   },
 ];
 
 const Features = () => {
   return (
-    <Box
-      component="section"
-      sx={{ bgcolor: "background.default" }}
-      className="py-24 px-4"
-    >
-      <Box className="max-w-6xl mx-auto">
-        <Box className="text-center mb-16">
-          <Typography
-            variant="overline"
-            sx={{
-              color: "primary.main",
-              fontWeight: 600,
-              letterSpacing: "0.2em",
-              fontSize: "0.9rem",
-            }}
-          >
-            What We Offer
-          </Typography>
+    <section className="bg-page-bg py-24 px-6">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">
+            Platform
+          </p>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+            Why <span className="text-gradient-primary">IndiceX</span>
+          </h2>
+        </motion.div>
 
-          <Typography
-            variant="h3"
-            sx={{
-              color: "text.primary",
-              fontWeight: 700,
-              mt: 1.5,
-              mb: 3,
-            }}
-          >
-            Platform{" "}
-            <Box component="span" sx={{ color: "primary.main" }}>
-              Features
-            </Box>
-          </Typography>
-
-          <Typography
-            sx={{
-              color: "text.secondary",
-              fontSize: "1.15rem",
-              maxWidth: 640,
-              mx: "auto",
-              lineHeight: 1.7,
-            }}
-          >
-            Everything you need for modern, on-chain index investing — built
-            with transparency and automation at the core.
-          </Typography>
-        </Box>
-
-        <Box className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {platformFeatures.map((feature) => (
-            <Box
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {features.map((feature, i) => (
+            <motion.div
               key={feature.title}
-              sx={{
-                bgcolor: "background.paper",
-                border: "1px solid",
-                borderColor: "rgba(0, 0, 0, 0.06)",
-                borderRadius: 3,
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  borderColor: "primary.main",
-                  transform: "translateY(-4px)",
-                  boxShadow: "0 12px 32px rgba(31, 94, 228, 0.08)",
-                  "& .feature-icon": {
-                    bgcolor: "primary.main",
-                    color: "#fff",
-                  },
-                },
-              }}
-              className="p-6"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              className="bg-card border border-border rounded-xl p-6 card-shine"
             >
-              <Box
-                className="feature-icon flex items-center justify-center mb-5"
-                sx={{
-                  bgcolor: "rgba(31, 94, 228, 0.08)",
-                  borderRadius: 2.5,
-                  width: 52,
-                  height: 52,
-                  color: "primary.main",
-                  transition: "all 0.3s ease",
-                }}
-              >
-                {feature.icon}
-              </Box>
-
-              <Typography
-                variant="h6"
-                sx={{
-                  color: "text.primary",
-                  fontWeight: 600,
-                  mb: 1.5,
-                  fontSize: "1.1rem",
-                }}
-              >
+              <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center text-primary mb-4">
+                <feature.icon size={20} />
+              </div>
+              <h3 className="text-lg font-bold text-foreground mb-2">
                 {feature.title}
-              </Typography>
-
-              <Typography
-                sx={{
-                  color: "text.secondary",
-                  fontSize: "0.925rem",
-                  lineHeight: 1.65,
-                }}
-              >
+              </h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 {feature.description}
-              </Typography>
-            </Box>
+              </p>
+            </motion.div>
           ))}
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </section>
   );
 };
 

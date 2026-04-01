@@ -1,57 +1,63 @@
 "use client";
 
-import { Box, Typography } from "@mui/material";
+import { motion } from "framer-motion";
 
 const Hero = () => {
   return (
-    <Box
-      component="section"
-      sx={{ bgcolor: "background.default" }}
-      className="py-24 px-4"
-    >
-      <Box className="max-w-4xl mx-auto text-center">
-        <Typography
-          variant="overline"
-          sx={{
-            color: "primary.main",
-            fontWeight: 600,
-            letterSpacing: "0.2em",
-            fontSize: "0.9rem",
-          }}
-        >
-          About Us
-        </Typography>
+    <section className="relative min-h-[70vh] flex items-center justify-center bg-page-bg overflow-hidden">
+      <div className="absolute inset-0 grid-bg" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-page-bg to-transparent" />
 
-        <Typography
-          variant="h2"
-          sx={{
-            color: "text.primary",
-            fontWeight: 700,
-            mt: 1.5,
-            mb: 3,
-            lineHeight: 1.15,
-          }}
+      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-6"
         >
-          About{" "}
-          <Box component="span" sx={{ color: "primary.main" }}>
-            IndiceX
-          </Box>
-        </Typography>
+          About IndiceX
+        </motion.p>
 
-        <Typography
-          sx={{
-            color: "text.secondary",
-            fontSize: "1.2rem",
-            maxWidth: 680,
-            mx: "auto",
-            lineHeight: 1.7,
-          }}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-6"
         >
-          A next-generation investment platform bringing the world&apos;s most
-          important market indices on-chain using stablecoins.
-        </Typography>
-      </Box>
-    </Box>
+          Built for the Future of
+          <br />
+          <span className="text-gradient-primary">Global Investing</span>
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10"
+        >
+          IndiceX is a non-custodial, on-chain index exposure platform built on
+          Base. Access diversified global market exposure through transparent,
+          composable DeFi primitives.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="flex items-center justify-center gap-4"
+        >
+          <div className="flex items-center gap-2 bg-muted border border-border text-muted-foreground text-xs font-semibold px-3 py-1 rounded-full">
+            <span className="w-2 h-2 rounded-full bg-ix-green" />
+            Non-Custodial
+          </div>
+          <div className="flex items-center gap-2 bg-muted border border-border text-muted-foreground text-xs font-semibold px-3 py-1 rounded-full">
+            <span className="w-2 h-2 rounded-full bg-base-blue" />
+            Built on Base
+          </div>
+        </motion.div>
+      </div>
+    </section>
   );
 };
 

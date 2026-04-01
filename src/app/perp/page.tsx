@@ -42,7 +42,7 @@ const Index = () => {
     ((spreadVal / asks[asks.length - 1].price) * 100).toFixed(3) + "%";
 
   return (
-    <div className="dark flex flex-col w-full bg-page-bg min-h-screen -mt-14 pt-18">
+    <div className="dark flex flex-col w-full bg-page-bg min-h-screen -mt-14 pt-14">
       {/* Top section: chart + order book/trade form */}
       <div className="flex flex-col xl-custom:flex-row flex-1">
         {/* Left Panel */}

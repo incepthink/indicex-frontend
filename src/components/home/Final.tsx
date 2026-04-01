@@ -5,13 +5,9 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 const Final = () => {
   return (
-    <Box
-      component="section"
-      sx={{ bgcolor: "#0A0B0D" }}
-      className="py-24 px-4"
-    >
+    <Box component="section" sx={{ bgcolor: "#0A0B0D" }} className="py-24 px-4">
       <Box className="max-w-3xl mx-auto text-center">
-        <Typography
+        {/* <Typography
           variant="overline"
           sx={{
             color: "primary.main",
@@ -21,7 +17,7 @@ const Final = () => {
           }}
         >
           Get Started
-        </Typography>
+        </Typography> */}
 
         <Typography
           variant="h3"
@@ -33,13 +29,10 @@ const Final = () => {
             lineHeight: 1.2,
           }}
         >
-          The Future of Index Investing is{" "}
-          <Box component="span" sx={{ color: "primary.main" }}>
-            On-Chain
-          </Box>
+          Ready to go on-chain?
         </Typography>
 
-        <Typography
+        {/* <Typography
           sx={{
             color: "rgba(255, 255, 255, 0.6)",
             fontSize: "1.15rem",
@@ -51,7 +44,7 @@ const Final = () => {
         >
           Start investing with IndiceX today. No banks, no borders — just
           seamless, transparent access to global indices powered by stablecoins.
-        </Typography>
+        </Typography> */}
 
         <Button
           variant="contained"

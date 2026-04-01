@@ -1,238 +1,112 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
-import { keyframes } from "@mui/system";
-
-const pulseGlow = keyframes`
-  0%   { box-shadow: 0 0 0px rgba(31, 94, 228, 0); }
-  50%  { box-shadow: 0 0 20px rgba(31, 94, 228, 0.5); }
-  100% { box-shadow: 0 0 0px rgba(31, 94, 228, 0); }
-`;
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, TrendingUp } from "lucide-react";
 
 const Hero = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 768px)");
-    setIsMobile(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  useEffect(() => {
-    if (isMobile) return;
-    const video = videoRef.current;
-    if (!video) return;
-
-    // Ensure muted is set on the DOM element (React JSX prop can be unreliable)
-    video.muted = true;
-
-    // Defer video loading until after initial paint
-    const timer = setTimeout(() => {
-      video.src = "/video/home-bg.mp4";
-      video.load();
-      video.play().catch(() => {});
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [isMobile]);
-
   return (
-    <Box
-      sx={{
-        position: "relative",
-        overflow: "hidden",
-        marginTop: "-56px",
-        paddingTop: "56px",
-        minHeight: "100vh",
-      }}
-      className="flex flex-col items-center justify-center text-center"
-    >
-      {/* Background video (hidden on mobile) */}
-      {!isMobile && (
-        <video
-          ref={videoRef}
-          autoPlay
-          loop
-          muted
-          playsInline
-          poster="/video/home-bg.png"
-          onCanPlay={() => setVideoLoaded(true)}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            zIndex: 1,
-            opacity: videoLoaded ? 1 : 0,
-            transition: "opacity 0.8s ease-in",
-          }}
-        />
-      )}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-page-bg">
+      {/* Grid background */}
+      <div className="absolute inset-0 grid-bg opacity-50" />
 
-      {/* Background image (always visible on mobile, fallback on desktop) */}
-      <Box
-        sx={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 0,
-          backgroundImage: "url(/video/home-bg.png)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          opacity: isMobile ? 1 : videoLoaded ? 0 : 1,
-          transition: "opacity 0.8s ease-in",
-        }}
-      />
+      {/* Radial glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-primary/5 blur-[120px] animate-pulse-glow" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-base-blue/8 blur-[80px]" />
 
-      {/* Color overlay */}
-      <Box
-        sx={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 2,
-          backgroundColor: "#FFFFFF",
-          opacity: 0.1,
-        }}
-      />
+      {/* Horizontal glow line */}
+      <div className="absolute top-1/2 left-0 right-0 h-px glow-line opacity-30" />
 
-      {/* Content */}
-      <Box
-        sx={{
-          position: "relative",
-          zIndex: 3,
-          backdropFilter: "blur(14px)",
-          WebkitBackdropFilter: "blur(14px)",
-          backgroundColor: "rgba(255, 255, 255, 0.6)",
-          borderRadius: 4,
-          px: { xs: 3, sm: 6, md: 8 },
-          py: { xs: 4, sm: 6 },
-          boxShadow: "0 4px 32px rgba(0,0,0,0.08)",
-        }}
-        className="flex flex-col items-center"
-      >
-        <Typography
-          variant="h2"
-          sx={{
-            color: "primary.main",
-            fontWeight: 600,
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            mb: 2,
-            fontSize: { xs: "1.85rem", sm: "2.7rem", md: "3.8rem" },
-          }}
+      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        {/* Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 mb-8"
         >
-          IndiceX
-        </Typography>
+          <div className="w-2 h-2 rounded-full bg-ix-green animate-pulse" />
+          <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
+            Live on Base
+          </span>
+        </motion.div>
 
-        <Typography
-          variant="h2"
-          sx={{
-            color: "text.primary",
-            fontWeight: 700,
-            maxWidth: 720,
-            lineHeight: 1.15,
-            mb: 3,
-            fontSize: { xs: "1.75rem", sm: "2.5rem", md: "3rem" },
-            px: { xs: 2, sm: 0 },
-          }}
+        {/* Main heading */}
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95] mb-6"
         >
-          Global Index Investing.{" "}
-          <Box component="span" sx={{ color: "primary.main" }}>
-            Powered by Stablecoins.
-          </Box>
-        </Typography>
+          <span className="text-gradient-hero">Trade & Invest in</span>
+          <br />
+          <span className="text-gradient-hero">Global Indices.</span>
+          <br />
+          <span className="text-gradient-primary">On-Chain.</span>
+        </motion.h1>
 
-        <Typography
-          variant="h6"
-          sx={{
-            color: "text.primary",
-            fontWeight: 500,
-            maxWidth: 600,
-            lineHeight: 1.6,
-            mb: 5,
-            fontSize: { xs: "0.95rem", sm: "1.15rem", md: "1.25rem" },
-            px: { xs: 2, sm: 0 },
-          }}
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          Access tokenized U.S. market indices on-chain. Invest instantly using
-          stablecoins — no banks, no borders, no delays.
-        </Typography>
+          Real-world market exposure — borderless, instant, non-custodial.
+          <br className="hidden sm:block" />
+          Index vaults and perpetual futures. No brokers, no banks.
+        </motion.p>
 
-        <Box className="flex flex-col sm:flex-row gap-4">
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center"
+        >
           <Button
-            variant="contained"
-            size="large"
-            sx={{
-              px: 4,
-              py: 1.5,
-              borderRadius: 2,
-              textTransform: "none",
-              fontSize: "1.05rem",
-              fontWeight: 600,
-              bgcolor: "primary.main",
-              animation: `${pulseGlow} 2.4s ease-in-out infinite`,
-              transition:
-                "transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease",
-              "&:hover": {
-                bgcolor: "#1A4FBF",
-                transform: "scale(1.04)",
-                boxShadow: "0 6px 24px rgba(31,94,228,0.45)",
-                animation: "none",
-              },
-              "&:active": {
-                transform: "scale(0.97)",
-              },
-            }}
+            variant="hero"
+            size="lg"
+            className="rounded-full px-8 h-12 text-base gap-2"
           >
-            Start Investing
+            Start Trading <ArrowRight size={18} />
           </Button>
           <Button
-            variant="outlined"
-            size="large"
-            sx={{
-              px: 4,
-              py: 1.5,
-              borderRadius: 2,
-              textTransform: "none",
-              fontSize: "1.05rem",
-              fontWeight: 600,
-              borderColor: "currentColor",
-              transition: "all 0.2s ease",
-              position: "relative",
-              overflow: "hidden",
-              "&::after": {
-                content: '"→"',
-                position: "absolute",
-                right: 14,
-                opacity: 0,
-                transform: "translateX(-6px)",
-                transition: "opacity 0.2s ease, transform 0.2s ease",
-              },
-              "&:hover": {
-                borderColor: "primary.main",
-                color: "primary.main",
-                transform: "scale(1.03)",
-                pr: 5.5,
-                "&::after": {
-                  opacity: 1,
-                  transform: "translateX(0)",
-                },
-              },
-              "&:active": {
-                transform: "scale(0.97)",
-              },
-            }}
+            variant="hero-outline"
+            size="lg"
+            className="rounded-full px-8 h-12 text-base gap-2"
           >
-            Explore Indices
+            <TrendingUp size={18} /> Explore Vaults
           </Button>
-        </Box>
-      </Box>
-    </Box>
+        </motion.div>
+
+        {/* Stats bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.1 }}
+          className="mt-20 grid grid-cols-3 gap-8 max-w-lg mx-auto"
+        >
+          {[
+            { label: "TVL", value: "$12.4M" },
+            { label: "Markets", value: "6+" },
+            { label: "Leverage", value: "50×" },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-white animate-count-up">
+                {stat.value}
+              </div>
+              <div className="text-xs text-white/60 uppercase tracking-widest mt-1">
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-page-bg to-transparent" />
+    </section>
   );
 };
 

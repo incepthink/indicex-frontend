@@ -1,77 +1,54 @@
 "use client";
 
-import { Box, Typography } from "@mui/material";
+import { motion } from "framer-motion";
 
 const Mission = () => {
   return (
-    <Box
-      component="section"
-      sx={{ bgcolor: "#0A0B0D" }}
-      className="py-24 px-4"
-    >
-      <Box className="max-w-5xl mx-auto">
-        <Box className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Left — Label & Heading */}
-          <Box>
-            <Typography
-              variant="overline"
-              sx={{
-                color: "primary.main",
-                fontWeight: 600,
-                letterSpacing: "0.2em",
-                fontSize: "0.9rem",
-              }}
-            >
+    <section className="bg-background py-24 px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-16 items-start">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">
               Our Mission
-            </Typography>
+            </p>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+              Democratizing Access to{" "}
+              <span className="text-gradient-primary">Global Markets</span>
+            </h2>
+          </motion.div>
 
-            <Typography
-              variant="h3"
-              sx={{
-                color: "#fff",
-                fontWeight: 700,
-                mt: 1.5,
-                lineHeight: 1.2,
-              }}
-            >
-              Bridging Traditional Markets &{" "}
-              <Box component="span" sx={{ color: "primary.main" }}>
-                Blockchain Finance
-              </Box>
-            </Typography>
-          </Box>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="space-y-5"
+          >
+            <p className="text-muted-foreground leading-7">
+              Traditional index investing has been gatekept by institutions,
+              custodians, and opaque intermediaries. IndiceX removes those
+              barriers by bringing diversified market exposure fully on-chain.
+            </p>
+            <p className="text-muted-foreground leading-7">
+              Our protocol lets anyone — anywhere in the world — access
+              institutional-grade index strategies using stablecoins, with full
+              transparency and no counterparty risk.
+            </p>
+            <p className="text-muted-foreground leading-7">
+              We believe the future of finance is open, composable, and
+              accessible to all.
+            </p>
+          </motion.div>
+        </div>
 
-          {/* Right — Description */}
-          <Box>
-            <Typography
-              sx={{
-                color: "rgba(255,255,255,0.65)",
-                fontSize: "1.1rem",
-                lineHeight: 1.8,
-                mb: 3,
-              }}
-            >
-              We bridge traditional markets and blockchain finance to offer
-              transparent, instant, and global access to diversified index
-              exposure.
-            </Typography>
-
-            <Typography
-              sx={{
-                color: "rgba(255,255,255,0.65)",
-                fontSize: "1.1rem",
-                lineHeight: 1.8,
-              }}
-            >
-              Whether you&apos;re an experienced investor or just getting
-              started, IndiceX removes the barriers — no banks, no borders, no
-              delays. Just smart, on-chain index investing powered by
-              stablecoins.
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+        <div className="glow-line h-px mt-16" />
+      </div>
+    </section>
   );
 };
 

@@ -1,269 +1,129 @@
-"use client";
+import { motion } from "framer-motion";
+import {
+  Wallet,
+  ArrowDownToLine,
+  Coins,
+  BarChart3,
+  ArrowUpFromLine,
+  Target,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 
-import { Box, Typography } from "@mui/material";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import TokenIcon from "@mui/icons-material/Token";
-import ShowChartIcon from "@mui/icons-material/ShowChart";
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-
-const steps = [
+const vaultSteps = [
   {
-    number: "01",
-    icon: <AccountBalanceWalletIcon sx={{ fontSize: 32, color: "#fff" }} />,
+    icon: Wallet,
+    title: "Connect Wallet",
+    desc: "Link your Web3 wallet in one click",
+  },
+  {
+    icon: ArrowDownToLine,
     title: "Deposit Stablecoins",
-    description:
-      "Connect your wallet and deposit USDC, USDT, or other supported stablecoins to get started.",
+    desc: "Send USDC or USDT to a vault",
   },
   {
-    number: "02",
-    icon: <TokenIcon sx={{ fontSize: 32, color: "#fff" }} />,
+    icon: Coins,
     title: "Receive Index Tokens",
-    description:
-      "Instantly receive tokenized index exposure representing your share of the underlying portfolio.",
+    desc: "Get tokens tracking your chosen index",
   },
   {
-    number: "03",
-    icon: <ShowChartIcon sx={{ fontSize: 32, color: "#fff" }} />,
-    title: "Track in Real Time",
-    description:
-      "Monitor your portfolio performance, NAV, and holdings — all verifiable on-chain, 24/7.",
+    icon: BarChart3,
+    title: "Track Performance",
+    desc: "Monitor returns on-chain anytime",
   },
   {
-    number: "04",
-    icon: <SwapHorizIcon sx={{ fontSize: 32, color: "#fff" }} />,
-    title: "Redeem Anytime",
-    description:
-      "Burn your index tokens to redeem the underlying stablecoins at any time. No lock-ups, no delays.",
+    icon: ArrowUpFromLine,
+    title: "Redeem Instantly",
+    desc: "Withdraw to stablecoins anytime",
   },
 ];
 
+const perpSteps = [
+  { icon: Wallet, title: "Connect Wallet", desc: "Link your Web3 wallet" },
+  {
+    icon: ArrowDownToLine,
+    title: "Deposit Collateral",
+    desc: "Fund with USDC or USDT",
+  },
+  { icon: Target, title: "Choose a Pair", desc: "S&P500-USDC or S&P500-DAI" },
+  {
+    icon: TrendingUp,
+    title: "Open Position",
+    desc: "Long or short with up to 50× leverage",
+  },
+  {
+    icon: TrendingDown,
+    title: "Close & Settle",
+    desc: "Close anytime, settle in stablecoins",
+  },
+];
+
+const StepRow = ({
+  steps,
+  label,
+}: {
+  steps: typeof vaultSteps;
+  label: string;
+}) => (
+  <div>
+    <h3 className="text-sm font-semibold text-primary uppercase tracking-[0.15em] mb-8">
+      {label}
+    </h3>
+    <div className="relative flex flex-col md:flex-row gap-6 md:gap-0">
+      {/* Connection line */}
+      <div className="hidden md:block absolute top-6 left-6 right-6 h-px bg-gradient-to-r from-primary/20 via-primary/10 to-transparent" />
+
+      {steps.map((step, i) => (
+        <motion.div
+          key={step.title}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: i * 0.1 }}
+          className="flex-1 relative"
+        >
+          <div className="relative z-10 flex flex-col items-center text-center px-2">
+            <div className="w-12 h-12 rounded-full bg-panel-bg border border-border flex items-center justify-center mb-4">
+              <step.icon size={20} className="text-primary" />
+            </div>
+            <div className="text-sm font-semibold text-foreground mb-1">
+              {step.title}
+            </div>
+            <div className="text-xs text-text-secondary leading-relaxed">
+              {step.desc}
+            </div>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+);
+
 const HowItWorks = () => {
   return (
-    <Box
-      component="section"
-      sx={{ bgcolor: "#0A0B0D" }}
-      className="py-20 px-4 h-screen flex flex-col items-center justify-center"
-    >
-      <Box className="max-w-6xl mx-auto w-full">
-        {/* Section Header */}
-        <Box className="text-center mb-20">
-          <Typography
-            variant="overline"
-            sx={{
-              color: "primary.main",
-              fontWeight: 600,
-              letterSpacing: "0.2em",
-              fontSize: "0.9rem",
-            }}
-          >
+    <section id="how-it-works" className="relative bg-page-bg py-32">
+      <div className="max-w-5xl mx-auto px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-20"
+        >
+          <span className="text-xs font-medium text-primary uppercase tracking-[0.2em] mb-4 block">
             How It Works
-          </Typography>
+          </span>
+          <h2 className="text-3xl md:text-5xl font-bold text-foreground">
+            From wallet to market in minutes
+          </h2>
+        </motion.div>
 
-          <Typography
-            variant="h3"
-            sx={{
-              color: "#fff",
-              fontWeight: 700,
-              mt: 1.5,
-              mb: 3,
-            }}
-          >
-            Four Simple{" "}
-            <Box component="span" sx={{ color: "primary.main" }}>
-              Steps
-            </Box>
-          </Typography>
-
-          <Typography
-            sx={{
-              color: "rgba(255,255,255,0.6)",
-              fontSize: "1.15rem",
-              maxWidth: 580,
-              mx: "auto",
-              lineHeight: 1.7,
-            }}
-          >
-            From stablecoins to diversified index exposure in minutes — fully
-            on-chain, fully transparent.
-          </Typography>
-        </Box>
-
-        {/* Steps - Desktop */}
-        <Box className="hidden lg:flex items-start justify-center">
-          {steps.map((step, index) => (
-            <Box key={step.number} className="flex items-start">
-              {/* Step Card */}
-              <Box
-                className="flex flex-col items-center text-center"
-                sx={{ width: 220 }}
-              >
-                <Box
-                  sx={{
-                    bgcolor: "rgba(255,255,255,0.1)",
-                    width: 72,
-                    height: 72,
-                    borderRadius: "50%",
-                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.3)",
-                    position: "relative",
-                  }}
-                  className="flex items-center justify-center mb-5"
-                >
-                  {step.icon}
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      top: -8,
-                      right: -8,
-                      bgcolor: "primary.main",
-                      color: "#fff",
-                      width: 28,
-                      height: 28,
-                      borderRadius: "50%",
-                      fontSize: "0.7rem",
-                      fontWeight: 700,
-                    }}
-                    className="flex items-center justify-center"
-                  >
-                    {step.number}
-                  </Box>
-                </Box>
-
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 600,
-                    mb: 1.5,
-                    fontSize: "1.1rem",
-                  }}
-                >
-                  {step.title}
-                </Typography>
-
-                <Typography
-                  sx={{
-                    color: "rgba(255,255,255,0.55)",
-                    fontSize: "0.925rem",
-                    lineHeight: 1.65,
-                    maxWidth: 240,
-                    mx: "auto",
-                  }}
-                >
-                  {step.description}
-                </Typography>
-              </Box>
-
-              {/* Horizontal Arrow */}
-              {index < steps.length - 1 && (
-                <Box
-                  sx={{ color: "primary.main", mt: "26px" }}
-                  className="flex items-center px-3 shrink-0"
-                >
-                  <Box
-                    sx={{
-                      height: 2,
-                      width: 32,
-                      bgcolor: "primary.main",
-                      opacity: 0.9,
-                      borderRadius: 1,
-                    }}
-                  />
-                  <ArrowForwardIcon sx={{ fontSize: 20, ml: -0.5 }} />
-                </Box>
-              )}
-            </Box>
-          ))}
-        </Box>
-
-        {/* Steps - Mobile */}
-        <Box className="flex lg:hidden flex-col items-center">
-          {steps.map((step, index) => (
-            <Box key={step.number} className="flex flex-col items-center">
-              {/* Step Card */}
-              <Box className="flex flex-col items-center text-center">
-                <Box
-                  sx={{
-                    bgcolor: "rgba(255,255,255,0.1)",
-                    width: 72,
-                    height: 72,
-                    borderRadius: "50%",
-                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.3)",
-                    position: "relative",
-                  }}
-                  className="flex items-center justify-center mb-5"
-                >
-                  {step.icon}
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      top: -8,
-                      right: -8,
-                      bgcolor: "primary.main",
-                      color: "#fff",
-                      width: 28,
-                      height: 28,
-                      borderRadius: "50%",
-                      fontSize: "0.7rem",
-                      fontWeight: 700,
-                    }}
-                    className="flex items-center justify-center"
-                  >
-                    {step.number}
-                  </Box>
-                </Box>
-
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 600,
-                    mb: 1.5,
-                    fontSize: "1.1rem",
-                  }}
-                >
-                  {step.title}
-                </Typography>
-
-                <Typography
-                  sx={{
-                    color: "rgba(255,255,255,0.55)",
-                    fontSize: "0.925rem",
-                    lineHeight: 1.65,
-                    maxWidth: 240,
-                    mx: "auto",
-                  }}
-                >
-                  {step.description}
-                </Typography>
-              </Box>
-
-              {/* Vertical Arrow */}
-              {index < steps.length - 1 && (
-                <Box
-                  sx={{ color: "primary.main" }}
-                  className="flex justify-center py-6"
-                >
-                  <Box className="flex flex-col items-center">
-                    <Box
-                      sx={{
-                        width: 2,
-                        height: 24,
-                        bgcolor: "primary.main",
-                        opacity: 0.9,
-                        borderRadius: 1,
-                      }}
-                    />
-                    <ArrowDownwardIcon sx={{ fontSize: 20, mt: -0.5 }} />
-                  </Box>
-                </Box>
-              )}
-            </Box>
-          ))}
-        </Box>
-      </Box>
-    </Box>
+        <div className="space-y-20">
+          <StepRow steps={vaultSteps} label="Index Vaults" />
+          <StepRow steps={perpSteps} label="Perpetual Trading" />
+        </div>
+      </div>
+    </section>
   );
 };
 

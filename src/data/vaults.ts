@@ -421,3 +421,37 @@ export function formatReturn(r: number): string {
 export function formatNav(nav: number): string {
   return `$${nav.toFixed(4)}`;
 }
+
+export function generateChartData(nav: number, range: string) {
+  const days =
+    range === "7D" ? 7 : range === "30D" ? 30 : range === "90D" ? 90 : 365;
+  const startFactor =
+    range === "7D"
+      ? 0.997
+      : range === "30D"
+        ? 0.963
+        : range === "90D"
+          ? 0.935
+          : 0.8;
+  const startNav = nav * startFactor;
+  const points = Math.min(
+    days,
+    range === "1Y" ? 52 : range === "90D" ? 30 : days,
+  );
+  const data = [];
+  for (let i = 0; i <= points; i++) {
+    const t = i / points;
+    const value =
+      startNav + (nav - startNav) * t + (Math.random() - 0.5) * 0.003;
+    const date = new Date();
+    date.setDate(date.getDate() - Math.round(days * (1 - t)));
+    data.push({
+      date: date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
+      value: parseFloat(value.toFixed(4)),
+    });
+  }
+  return data;
+}

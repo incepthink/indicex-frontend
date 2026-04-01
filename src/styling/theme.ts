@@ -11,8 +11,8 @@ const theme = createTheme({
       main: "#0A0B0D", // Near Black
     },
     background: {
-      default: "#EEF0F3", // Light Gray
-      paper: "#FFFFFF",
+      default: "#0A0A0A", // Dark background
+      paper: "#111111",
     },
     text: {
       primary: "#0A0B0D", // Near Black

@@ -1,9 +1,15 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useAccount } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useParams, useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  ArrowLeft,
+  Wallet,
+  ChevronDown,
+  CheckCircle,
+  Loader2,
+} from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -14,778 +20,875 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import {
-  Wallet,
-  Activity,
-  ShieldCheck,
-  RefreshCw,
-  ChevronDown,
-  CheckCircle,
-} from "lucide-react";
-import { vaults, formatTvl, formatReturn, formatNav } from "@/data/vaults";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  vaults,
+  formatTvl,
+  formatReturn,
+  formatNav,
+  generateChartData,
+} from "@/data/vaults";
 
-const chartTabs = ["NAV Price", "Vault Balance", "30D Return"] as const;
-const timeRanges = ["7D", "30D", "90D", "1Y"] as const;
+type ChartTab = "NAV Price" | "Vault Balance" | "30D Return";
+type TimeRange = "7D" | "30D" | "90D" | "1Y";
+type PanelTab = "deposit" | "withdraw";
+type PageTab = "performance" | "overview";
 
-function generateChartData(nav: number, range: string) {
-  const days =
-    range === "7D" ? 7 : range === "30D" ? 30 : range === "90D" ? 90 : 365;
-  const startFactor =
-    range === "7D"
-      ? 0.997
-      : range === "30D"
-        ? 0.963
-        : range === "90D"
-          ? 0.935
-          : 0.8;
-  const startNav = nav * startFactor;
-  const points = Math.min(
-    days,
-    range === "1Y" ? 52 : range === "90D" ? 30 : days,
-  );
-  const data = [];
-  for (let i = 0; i <= points; i++) {
-    const t = i / points;
-    const value =
-      startNav + (nav - startNav) * t + (Math.random() - 0.5) * 0.003;
-    const date = new Date();
-    date.setDate(date.getDate() - Math.round(days * (1 - t)));
-    data.push({
-      date: date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      }),
-      value: parseFloat(value.toFixed(4)),
-    });
-  }
-  return data;
-}
-
-export default function VaultDetailPage() {
+const VaultDetail = () => {
   const params = useParams();
   const id = params.id as string;
   const router = useRouter();
+
   const vault = vaults.find((v) => v.id === id);
 
-  const [pageTab, setPageTab] = useState<"performance" | "overview">(
-    "performance",
-  );
-  const [chartTab, setChartTab] =
-    useState<(typeof chartTabs)[number]>("NAV Price");
-  const [timeRange, setTimeRange] =
-    useState<(typeof timeRanges)[number]>("30D");
-  const { isConnected, address } = useAccount();
-
-  const [depositWithdraw, setDepositWithdraw] = useState<
-    "deposit" | "withdraw"
-  >("deposit");
-  const [depositAmount, setDepositAmount] = useState("");
+  const [pageTab, setPageTab] = useState<PageTab>("performance");
+  const [chartTab, setChartTab] = useState<ChartTab>("NAV Price");
+  const [timeRange, setTimeRange] = useState<TimeRange>("30D");
+  const [panelTab, setPanelTab] = useState<PanelTab>("deposit");
+  const [amount, setAmount] = useState("");
   const [selectedToken, setSelectedToken] = useState("USDC");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [lastAction, setLastAction] = useState<PanelTab>("deposit");
 
-  function handleTransaction() {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setShowSuccess(true);
-    }, 2000);
-  }
+  // Simulated wallet state
+  const [isConnected, setIsConnected] = useState(false);
+  const address = isConnected
+    ? "0x1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7e8F9a0B"
+    : undefined;
 
   const chartData = useMemo(
     () => (vault ? generateChartData(vault.nav, timeRange) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [vault?.nav, timeRange, chartTab],
+    [vault?.nav, timeRange],
   );
+
+  const periodReturn = useMemo(() => {
+    if (!chartData.length) return 0;
+    const first = chartData[0].value;
+    const last = chartData[chartData.length - 1].value;
+    return ((last - first) / first) * 100;
+  }, [chartData]);
+
+  const annualizedReturn = useMemo(() => {
+    const days =
+      timeRange === "7D"
+        ? 7
+        : timeRange === "30D"
+          ? 30
+          : timeRange === "90D"
+            ? 90
+            : 365;
+    return periodReturn * (365 / days);
+  }, [periodReturn, timeRange]);
 
   if (!vault) {
     return (
-      <div className="flex flex-col items-center justify-center py-32">
-        <h2 className="text-xl font-bold text-black mb-2">Vault not found</h2>
-        <button
-          onClick={() => router.push("/vaults")}
-          className="text-primary text-sm font-medium hover:underline"
-        >
-          ← Back to Vaults
-        </button>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-muted-foreground">Vault not found.</p>
       </div>
     );
   }
 
-  const parsedAmount = parseFloat(depositAmount) || 0;
-  const receiveTokens =
-    parsedAmount > 0 ? (parsedAmount / vault.nav).toFixed(4) : "0.0000";
-  const periodReturn =
-    chartData.length >= 2
-      ? (
-          ((chartData[chartData.length - 1].value - chartData[0].value) /
-            chartData[0].value) *
-          100
-        ).toFixed(2)
-      : "0.00";
-  const periodReturnNum = parseFloat(periodReturn);
   const maxWeight = Math.max(...vault.holdings.map((h) => h.weight));
+  const displayedHoldings = vault.holdings.slice(0, 10);
+  const remainingHoldings = vault.totalHoldings - displayedHoldings.length;
+
+  const handleSubmit = () => {
+    if (!amount || parseFloat(amount) <= 0) return;
+    setIsProcessing(true);
+    setLastAction(panelTab);
+    setTimeout(() => {
+      setIsProcessing(false);
+      setShowSuccess(true);
+      setAmount("");
+    }, 1500);
+  };
+
+  const fillAmount = (pct: number) => {
+    const balance = 10000;
+    setAmount((balance * pct).toFixed(2));
+  };
 
   return (
     <>
-      {/* Header strip — consistent card background to avoid MUI layout bleed */}
-      <div className="bg-card border-b border-border">
-        {/* Back */}
-        <div className="px-8 pt-5 pb-2">
+      {/* Header Strip */}
+      <div className="border-b border-border bg-card">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5">
           <button
-            onClick={() => router.back()}
-            className="text-sm text-primary font-medium hover:underline"
+            onClick={() => router.push("/vaults")}
+            className="text-primary text-sm font-medium hover:underline flex items-center gap-1 mb-4"
           >
-            ← Back to Vaults
+            <ArrowLeft className="w-4 h-4" />
+            Back to Vaults
           </button>
-        </div>
 
-        {/* Header */}
-        <div className="px-8 pb-0 pt-2 flex flex-wrap items-start justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center font-bold text-base text-primary">
-              {vault.abbr}
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-black">{vault.name}</h1>
-              <div className="flex gap-2 mt-1">
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-muted border border-border text-muted-foreground">
-                  {vault.category}
-                </span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-muted border border-border text-muted-foreground">
-                  {vault.riskLevel} Risk
-                </span>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-primary font-bold text-lg shrink-0">
+                {vault.abbr}
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">
+                  {vault.name}
+                </h1>
+                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                  <span className="bg-muted border border-border text-muted-foreground text-xs px-2.5 py-0.5 rounded-full">
+                    {vault.category}
+                  </span>
+                  <span className="bg-muted border border-border text-muted-foreground text-xs px-2.5 py-0.5 rounded-full">
+                    {vault.riskLevel}
+                  </span>
+                  {vault.acceptedTokens.map((t) => (
+                    <span
+                      key={t}
+                      className="bg-accent text-primary text-xs font-semibold px-2 py-0.5 rounded"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-          <div className="flex gap-6 items-center">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">
-                Deposit Token:
-              </span>
-              {vault.acceptedTokens.map((t) => (
-                <span
-                  key={t}
-                  className="text-xs font-semibold px-2 py-0.5 rounded bg-accent text-primary"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
         </div>
 
-        {/* Page tabs */}
-        <div className="mt-5 border-b border-border px-8 flex gap-0">
-          {(["performance", "overview"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setPageTab(tab)}
-              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors duration-150 ${
-                pageTab === tab
-                  ? "text-primary border-primary font-semibold"
-                  : "text-muted-foreground border-transparent hover:text-black"
-              }`}
-            >
-              {tab === "performance" ? "Vault Performance" : "Overview"}
-            </button>
-          ))}
+        {/* Tab Bar */}
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-6 border-b border-border -mb-px">
+            {(["performance", "overview"] as PageTab[]).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setPageTab(tab)}
+                className={`pb-3 text-sm font-semibold border-b-2 transition-colors ${
+                  pageTab === tab
+                    ? "text-primary border-primary"
+                    : "text-muted-foreground border-transparent hover:text-foreground"
+                }`}
+              >
+                {tab === "performance" ? "Vault Performance" : "Overview"}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Main layout */}
-      <div className="flex flex-col lg:flex-row gap-5 px-8 py-5 items-start">
-        {/* Left column */}
-        <div className="flex-1 min-w-0 space-y-4">
-          {pageTab === "performance" ? (
-            <>
-              {/* Stats row */}
-              <div className="bg-card border border-border rounded-xl px-6 py-5">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-0 md:divide-x divide-border">
-                  {[
-                    {
-                      label: "1Y Return",
-                      value: formatReturn(vault.return1y),
-                      color:
-                        vault.return1y >= 0
-                          ? "text-success"
-                          : "text-destructive",
-                    },
-                    {
-                      label: "Vault Age",
-                      value: `${vault.ageInDays} days`,
-                      color: "text-black",
-                    },
-                    {
-                      label: "TVL",
-                      value: formatTvl(vault.tvl),
-                      color: "text-black",
-                    },
-                    {
-                      label: "Vault Capacity",
-                      value: `${vault.capacityPct}%`,
-                      color: "text-black",
-                    },
-                  ].map((s, i) => (
-                    <div
-                      key={i}
-                      className={`${i > 0 ? "md:pl-5" : ""} ${i < 3 ? "md:pr-5" : ""}`}
-                    >
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1 font-semibold">
-                        {s.label}
-                      </p>
-                      <p className={`text-xl font-bold ${s.color}`}>
-                        {s.value}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Chart card */}
-              <div className="bg-card border border-border rounded-xl p-5">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-semibold text-black">
-                    Performance Breakdown
-                  </h3>
-                  <span className="text-sm text-primary cursor-pointer hover:underline">
-                    View Activities →
-                  </span>
-                </div>
-                <div className="flex gap-8 mb-4">
-                  <div>
-                    <p className="text-xs text-muted-foreground uppercase">
-                      Max Daily Drawdown
-                    </p>
-                    <p className="text-sm font-semibold text-destructive">
-                      {vault.maxDailyDrawdown}%
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground uppercase">
-                      Avg Daily Volume
-                    </p>
-                    <p className="text-sm font-semibold text-black">
-                      ${vault.avgDailyVolume.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                  <div className="flex gap-1">
-                    {chartTabs.map((t) => (
-                      <button
-                        key={t}
-                        onClick={() => setChartTab(t)}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors duration-150 ${
-                          chartTab === t
-                            ? "bg-black text-card"
-                            : "text-muted-foreground hover:text-black"
-                        }`}
-                      >
-                        {t}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex gap-1">
-                    {timeRanges.map((t) => (
-                      <button
-                        key={t}
-                        onClick={() => setTimeRange(t)}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors duration-150 ${
-                          timeRange === t
-                            ? "bg-black text-card"
-                            : "text-muted-foreground hover:text-black"
-                        }`}
-                      >
-                        {t}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <ResponsiveContainer width="100%" height={240}>
-                  <AreaChart data={chartData}>
-                    <defs>
-                      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop
-                          offset="0%"
-                          stopColor="hsl(222, 78%, 51%)"
-                          stopOpacity={0.15}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="hsl(222, 78%, 51%)"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      stroke="var(--border)"
-                      strokeDasharray="3 3"
-                    />
-                    <XAxis
-                      dataKey="date"
-                      tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                      tickLine={false}
-                      axisLine={false}
-                      interval="preserveStartEnd"
-                    />
-                    <YAxis
-                      tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                      tickLine={false}
-                      axisLine={false}
-                      domain={["auto", "auto"]}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: "var(--card)",
-                        border: "1px solid var(--border)",
-                        borderRadius: "8px",
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
-                        color: "var(--foreground)",
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="value"
-                      stroke="hsl(222, 78%, 51%)"
-                      strokeWidth={1.5}
-                      fill="url(#areaGrad)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-                <div className="flex gap-6 mt-3 text-sm">
-                  <span>
-                    Period Return:{" "}
-                    <span
-                      className={
-                        periodReturnNum >= 0
-                          ? "text-success font-semibold"
-                          : "text-destructive font-semibold"
-                      }
-                    >
-                      {periodReturnNum >= 0 ? "+" : ""}
-                      {periodReturn}%
-                    </span>
-                  </span>
-                  <span>
-                    Annualized:{" "}
-                    <span className="text-success font-semibold">
-                      {formatReturn(vault.return1y)}
-                    </span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Index composition */}
-              <div className="bg-card border border-border rounded-xl p-5">
-                <h3 className="font-semibold text-black">Index Composition</h3>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  Top {vault.holdings.length} holdings by weight
-                </p>
-                <div className="mt-4 space-y-2.5">
-                  {vault.holdings.map((h, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <span className="text-xs w-5 text-muted-foreground font-mono">
-                        {i + 1}
-                      </span>
-                      <span className="text-sm font-medium text-black w-36 truncate">
-                        {h.name}
-                      </span>
-                      <span className="text-xs font-mono text-muted-foreground w-14">
-                        {h.ticker}
-                      </span>
-                      <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-primary rounded-full"
-                          style={{ width: `${(h.weight / maxWeight) * 80}%` }}
-                        />
-                      </div>
-                      <span className="text-sm font-semibold text-black w-10 text-right">
-                        {h.weight}%
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                {vault.totalHoldings > vault.holdings.length && (
-                  <p className="text-sm text-muted-foreground mt-3">
-                    + {vault.totalHoldings - vault.holdings.length} more
-                    holdings
-                  </p>
-                )}
-              </div>
-
-              {/* Recent activity */}
-              <div className="bg-card border border-border rounded-xl p-5">
-                <h3 className="font-semibold text-black">Recent Activity</h3>
-                <div className="mt-3 overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left text-xs uppercase tracking-wide text-muted-foreground pb-2">
-                          Type
-                        </th>
-                        <th className="text-left text-xs uppercase tracking-wide text-muted-foreground pb-2">
-                          Amount
-                        </th>
-                        <th className="text-left text-xs uppercase tracking-wide text-muted-foreground pb-2">
-                          Wallet
-                        </th>
-                        <th className="text-left text-xs uppercase tracking-wide text-muted-foreground pb-2">
-                          Time
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {vault.activity.map((a, i) => (
-                        <tr
-                          key={i}
-                          className={
-                            i < vault.activity.length - 1
-                              ? "border-b border-border/40"
-                              : ""
-                          }
-                        >
-                          <td className="py-3">
-                            <span
-                              className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
-                                a.type === "Deposit"
-                                  ? "bg-success/10 text-success border-success/30"
-                                  : "bg-destructive/10 text-destructive border-destructive/30"
-                              }`}
-                            >
-                              {a.type}
-                            </span>
-                          </td>
-                          <td className="py-3 text-sm font-semibold text-black">
-                            ${a.amount.toLocaleString()} {a.token}
-                          </td>
-                          <td className="py-3 text-xs font-mono text-muted-foreground">
-                            {a.user}
-                          </td>
-                          <td className="py-3 text-xs text-muted-foreground">
-                            {a.time}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </>
-          ) : (
-            /* Overview tab */
-            <div className="bg-card border border-border rounded-xl p-6">
-              <h3 className="font-semibold text-black mb-3">
-                About this Vault
-              </h3>
-              <p className="text-sm text-muted-foreground leading-7 mb-5">
-                {vault.description}
-              </p>
-              <div className="grid grid-cols-2 gap-4 mt-2">
-                {[
-                  ["Inception Date", vault.inceptionDate],
-                  ["Rebalance Frequency", vault.rebalance],
-                  ["Management Fee", vault.fee],
-                  ["Oracle Provider", vault.oracle],
-                  ["Smart Contract", vault.contract, true],
-                  ["Blockchain", vault.blockchain],
-                  ["Accepted Tokens", vault.acceptedTokens.join(", ")],
-                  ["Total Holdings", vault.totalHoldings.toString()],
-                ].map(([label, value, mono]) => (
-                  <div key={label as string}>
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground mb-0.5">
-                      {label}
-                    </p>
-                    <p
-                      className={`text-sm font-semibold text-black ${mono ? "font-mono text-xs" : ""}`}
-                    >
-                      {value}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right column */}
-        <div className="w-full lg:w-96 shrink-0 space-y-4 lg:sticky lg:top-20">
-          {/* Deposit/Withdraw panel */}
-          <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
-            <div className="flex border-b border-border">
-              {(["deposit", "withdraw"] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setDepositWithdraw(tab)}
-                  className={`flex-1 py-3 text-sm font-semibold text-center cursor-pointer transition-colors duration-150 border-b-2 ${
-                    depositWithdraw === tab
-                      ? "bg-card text-primary border-primary"
-                      : "bg-surface-muted text-muted-foreground border-transparent"
-                  }`}
-                >
-                  {tab === "deposit" ? "Deposit" : "Withdraw"}
-                </button>
-              ))}
-            </div>
-            <div className="px-5 py-4">
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">
-                Amount
-              </label>
-              <div className="border border-border rounded-lg overflow-hidden flex hover:border-primary focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition-all duration-150">
-                <input
-                  type="number"
-                  placeholder="0.00"
-                  value={depositAmount}
-                  onChange={(e) => setDepositAmount(e.target.value)}
-                  className="flex-1 px-3 py-3 text-lg font-semibold outline-none bg-card text-black"
-                />
-                {depositWithdraw === "deposit" ? (
-                  <div className="border-l border-border px-3 bg-surface-muted flex items-center gap-1.5 cursor-pointer text-sm font-semibold text-black">
-                    <div className="w-4 h-4 rounded-full bg-primary" />
-                    {selectedToken}
-                    <ChevronDown size={14} className="text-muted-foreground" />
-                  </div>
-                ) : (
-                  <div className="border-l border-border px-3 bg-surface-muted flex items-center text-sm font-semibold text-muted-foreground">
-                    ind{vault.abbr}
-                  </div>
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1.5">
-                {!isConnected
-                  ? "Connect wallet to see balance"
-                  : depositWithdraw === "deposit"
-                    ? `Balance: 10,000 ${selectedToken}`
-                    : `Balance: 0 ind${vault.abbr} tokens`}
-              </p>
-
-              <div className="flex gap-2 mt-3">
-                {[
-                  { label: "25%", val: "2500" },
-                  { label: "50%", val: "5000" },
-                  { label: "75%", val: "7500" },
-                  { label: "MAX", val: "10000" },
-                ].map((b) => (
-                  <button
-                    key={b.label}
-                    onClick={() => setDepositAmount(b.val)}
-                    className="border border-border rounded-md px-2.5 py-1 text-xs font-semibold text-muted-foreground cursor-pointer hover:border-primary hover:text-primary hover:bg-accent transition-all duration-100"
-                  >
-                    {b.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="my-4 border-t border-border/50" />
-
-              <div className="bg-surface-muted rounded-lg p-3 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="font-medium text-muted-foreground">
-                    You receive
-                  </span>
-                  <span className="font-semibold text-black">
-                    {depositWithdraw === "deposit"
-                      ? `${receiveTokens} ind${vault.abbr}`
-                      : `~$${parsedAmount > 0 ? (parsedAmount * vault.nav).toFixed(2) : "0"} USDC`}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>NAV per Token</span>
-                  <span>{formatNav(vault.nav)}</span>
-                </div>
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Annual Fee</span>
-                  <span>{vault.fee} / yr</span>
-                </div>
-                {depositWithdraw === "deposit" && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Est. 1Y Return
-                    </span>
-                    <span className="font-semibold text-success">
-                      +{vault.return1y}%
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {isConnected ? (
-                <button
-                  onClick={handleTransaction}
-                  disabled={isLoading || parsedAmount <= 0}
-                  className={`mt-4 w-full py-3 rounded-lg font-semibold text-sm transition-opacity duration-150 hover:opacity-90 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
-                    depositWithdraw === "deposit"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-black text-card"
-                  }`}
-                >
-                  {isLoading ? (
-                    <>
-                      <svg
-                        className="animate-spin h-4 w-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                        />
-                      </svg>
-                      Processing...
-                    </>
-                  ) : depositWithdraw === "deposit" ? (
-                    "Deposit"
-                  ) : (
-                    "Withdraw"
-                  )}
-                </button>
-              ) : (
-                <ConnectButton.Custom>
-                  {({ openConnectModal }) => (
-                    <button
-                      onClick={openConnectModal}
-                      className={`mt-4 w-full py-3 rounded-lg font-semibold text-sm transition-opacity duration-150 hover:opacity-90 ${
-                        depositWithdraw === "deposit"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-black text-card"
-                      }`}
-                    >
-                      Connect Wallet
-                    </button>
-                  )}
-                </ConnectButton.Custom>
-              )}
-              <p className="text-xs text-center text-muted-foreground mt-2">
-                Smart contract audited. Funds deployed on-chain.
-              </p>
-            </div>
-          </div>
-
-          {/* Your Position */}
-          <div className="bg-card border border-border rounded-xl p-5">
-            <h3 className="font-semibold text-black mb-4">Your Position</h3>
-            {isConnected && address ? (
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Wallet</span>
-                  <span className="font-mono text-xs text-black">
-                    {address.slice(0, 6)}...{address.slice(-4)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">
-                    ind{vault.abbr} Balance
-                  </span>
-                  <span className="font-semibold text-black">0.0000</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Value (USD)</span>
-                  <span className="font-semibold text-black">$0.00</span>
-                </div>
-              </div>
+      {/* Main Layout */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Left Column */}
+          <div className="flex-1 min-w-0 space-y-6">
+            {pageTab === "performance" ? (
+              <PerformanceTab
+                vault={vault}
+                chartData={chartData}
+                chartTab={chartTab}
+                setChartTab={setChartTab}
+                timeRange={timeRange}
+                setTimeRange={setTimeRange}
+                periodReturn={periodReturn}
+                annualizedReturn={annualizedReturn}
+                maxWeight={maxWeight}
+                displayedHoldings={displayedHoldings}
+                remainingHoldings={remainingHoldings}
+              />
             ) : (
-              <div className="py-5 flex flex-col items-center w-full">
-                <Wallet size={28} className="text-muted-foreground/40 mb-2" />
-                <p className="text-sm text-muted-foreground text-center">
-                  Connect your wallet to view your position
-                </p>
-                <ConnectButton.Custom>
-                  {({ openConnectModal }) => (
-                    <button
-                      onClick={openConnectModal}
-                      className="mt-3 w-full py-2.5 rounded-lg font-semibold text-sm bg-primary text-primary-foreground transition-opacity duration-150 hover:opacity-90"
-                    >
-                      Connect Wallet
-                    </button>
-                  )}
-                </ConnectButton.Custom>
-              </div>
+              <OverviewTab vault={vault} />
             )}
           </div>
 
-          {/* Vault Health */}
-          {/* <div className="bg-card border border-border rounded-xl p-5">
-            <h3 className="font-semibold text-black mb-3">Vault Health</h3>
-            <div className="space-y-3">
-              {[
-                {
-                  icon: Activity,
-                  label: "Oracle Feed",
-                  status: "Live & Active",
-                },
-                {
-                  icon: ShieldCheck,
-                  label: "Smart Contract",
-                  status: "Verified",
-                },
-                {
-                  icon: RefreshCw,
-                  label: "Rebalancing",
-                  status: "On Schedule",
-                },
-              ].map(({ icon: Icon, label, status }) => (
-                <div key={label} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Icon size={15} className="text-muted-foreground" />
-                    <span className="text-sm text-black">{label}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-success" />
-                    <span className="text-xs font-semibold text-success">
-                      {status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div> */}
+          {/* Right Sidebar */}
+          <div className="w-full lg:w-96 shrink-0 space-y-6 lg:sticky lg:top-20 lg:self-start">
+            <DepositWithdrawPanel
+              vault={vault}
+              panelTab={panelTab}
+              setPanelTab={setPanelTab}
+              amount={amount}
+              setAmount={setAmount}
+              selectedToken={selectedToken}
+              setSelectedToken={setSelectedToken}
+              isProcessing={isProcessing}
+              isConnected={isConnected}
+              onConnect={() => setIsConnected(true)}
+              onSubmit={handleSubmit}
+              fillAmount={fillAmount}
+            />
+            <PositionPanel
+              vault={vault}
+              isConnected={isConnected}
+              address={address}
+              onConnect={() => setIsConnected(true)}
+            />
+          </div>
         </div>
       </div>
 
       {/* Success Modal */}
       <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
-        <DialogContent className="sm:max-w-sm text-center bg-white">
-          <div className="flex flex-col items-center gap-4 py-4">
-            <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center">
-              <CheckCircle size={48} className="text-success" strokeWidth={1.5} />
+        <DialogContent className="bg-card border-border sm:max-w-md">
+          <DialogHeader className="flex flex-col items-center text-center pt-4">
+            <div className="w-20 h-20 rounded-full bg-ix-green/10 flex items-center justify-center mb-4">
+              <CheckCircle className="w-10 h-10 text-ix-green" />
             </div>
-            <DialogHeader className="items-center space-y-1">
-              <DialogTitle className="text-xl font-bold text-black">
-                Transaction Successful
-              </DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground text-center">
-                {depositWithdraw === "deposit"
-                  ? `Your deposit of ${parsedAmount > 0 ? `$${parsedAmount.toLocaleString()}` : "funds"} ${selectedToken} was submitted successfully.`
-                  : `Your withdrawal of ${parsedAmount > 0 ? `${parsedAmount} ind${vault.abbr}` : "tokens"} was submitted successfully.`}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="w-full pt-2">
-              <button
-                onClick={() => setShowSuccess(false)}
-                className="w-full py-2.5 rounded-lg font-semibold text-sm bg-primary text-primary-foreground transition-opacity duration-150 hover:opacity-90"
-              >
-                Done
-              </button>
-            </div>
-          </div>
+            <DialogTitle className="text-xl font-bold text-foreground">
+              Transaction Successful
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm text-center mt-2">
+              {lastAction === "deposit"
+                ? `Your deposit of ${amount || "—"} has been processed and your ind${vault.abbr} tokens have been minted.`
+                : `Your withdrawal has been processed and funds have been returned to your wallet.`}
+            </DialogDescription>
+          </DialogHeader>
+          <button
+            onClick={() => setShowSuccess(false)}
+            className="w-full py-2.5 rounded-lg font-semibold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors mt-2"
+          >
+            Done
+          </button>
         </DialogContent>
       </Dialog>
     </>
   );
+};
+
+/* ─── Performance Tab ─── */
+function PerformanceTab({
+  vault,
+  chartData,
+  chartTab,
+  setChartTab,
+  timeRange,
+  setTimeRange,
+  periodReturn,
+  annualizedReturn,
+  maxWeight,
+  displayedHoldings,
+  remainingHoldings,
+}: {
+  vault: NonNullable<ReturnType<typeof vaults.find>>;
+  chartData: { date: string; value: number }[];
+  chartTab: ChartTab;
+  setChartTab: (t: ChartTab) => void;
+  timeRange: TimeRange;
+  setTimeRange: (t: TimeRange) => void;
+  periodReturn: number;
+  annualizedReturn: number;
+  maxWeight: number;
+  displayedHoldings: NonNullable<ReturnType<typeof vaults.find>>["holdings"];
+  remainingHoldings: number;
+}) {
+  return (
+    <>
+      {/* Stats Row */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="bg-card border border-border rounded-xl overflow-hidden"
+      >
+        <div className="grid grid-cols-2 md:grid-cols-4 md:divide-x divide-border">
+          <StatCell
+            label="1Y Return"
+            value={formatReturn(vault.return1y)}
+            colored
+            positive={vault.return1y >= 0}
+          />
+          <StatCell label="Vault Age" value={`${vault.ageInDays} days`} />
+          <StatCell label="TVL" value={formatTvl(vault.tvl)} />
+          <StatCell label="Vault Capacity" value={`${vault.capacityPct}%`} />
+        </div>
+      </motion.div>
+
+      {/* Chart Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="bg-card border border-border rounded-xl p-5 sm:p-6"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <h3 className="text-base font-semibold text-foreground">
+            Performance Breakdown
+          </h3>
+          <button className="text-primary text-sm font-medium hover:underline">
+            View Activities →
+          </button>
+        </div>
+
+        <div className="flex flex-wrap gap-6 mb-5">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
+              Max Daily Drawdown
+            </p>
+            <p className="text-sm font-semibold text-ix-red mt-0.5">
+              {vault.maxDailyDrawdown.toFixed(2)}%
+            </p>
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
+              Avg Daily Volume
+            </p>
+            <p className="text-sm font-semibold text-foreground mt-0.5">
+              {formatTvl(vault.avgDailyVolume)}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div className="flex gap-1 bg-muted rounded-lg p-0.5">
+            {(["NAV Price", "Vault Balance", "30D Return"] as ChartTab[]).map(
+              (t) => (
+                <button
+                  key={t}
+                  onClick={() => setChartTab(t)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                    chartTab === t
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t}
+                </button>
+              ),
+            )}
+          </div>
+          <div className="flex gap-1 bg-muted rounded-lg p-0.5">
+            {(["7D", "30D", "90D", "1Y"] as TimeRange[]).map((t) => (
+              <button
+                key={t}
+                onClick={() => setTimeRange(t)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                  timeRange === t
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="h-64 sm:h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData}>
+              <defs>
+                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="0%"
+                    stopColor="hsl(222, 78%, 51%)"
+                    stopOpacity={0.3}
+                  />
+                  <stop
+                    offset="100%"
+                    stopColor="hsl(222, 78%, 51%)"
+                    stopOpacity={0}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(0, 0%, 16%)"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="date"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "hsl(233, 12%, 60%)", fontSize: 11 }}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "hsl(233, 12%, 60%)", fontSize: 11 }}
+                domain={["auto", "auto"]}
+                tickFormatter={(v: number) => `$${v.toFixed(2)}`}
+                width={60}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: "hsl(0, 0%, 7%)",
+                  border: "1px solid hsl(0, 0%, 16%)",
+                  borderRadius: "8px",
+                  padding: "8px 12px",
+                }}
+                labelStyle={{ color: "hsl(233, 12%, 60%)", fontSize: 11 }}
+                itemStyle={{ color: "hsl(0, 0%, 100%)", fontWeight: 600 }}
+                formatter={(value: number) => [`$${value.toFixed(4)}`, "NAV"]}
+              />
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke="hsl(222, 78%, 51%)"
+                strokeWidth={2}
+                fill="url(#areaGrad)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="flex gap-6 mt-4 pt-4 border-t border-border">
+          <div>
+            <p className="text-xs text-muted-foreground">Period Return</p>
+            <p
+              className={`text-sm font-bold ${
+                periodReturn >= 0 ? "text-ix-green" : "text-ix-red"
+              }`}
+            >
+              {formatReturn(periodReturn)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Annualized</p>
+            <p
+              className={`text-sm font-bold ${
+                annualizedReturn >= 0 ? "text-ix-green" : "text-ix-red"
+              }`}
+            >
+              {formatReturn(annualizedReturn)}
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Index Composition */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+        className="bg-card border border-border rounded-xl p-5 sm:p-6"
+      >
+        <h3 className="text-base font-semibold text-foreground">
+          Index Composition
+        </h3>
+        <p className="text-sm text-muted-foreground mt-1 mb-5">
+          Top {displayedHoldings.length} holdings by weight
+        </p>
+        <div className="space-y-3">
+          {displayedHoldings.map((h, i) => (
+            <div key={h.ticker} className="flex items-center gap-3">
+              <span className="w-5 text-xs font-mono text-muted-foreground text-right">
+                {i + 1}
+              </span>
+              <span className="w-36 text-sm font-medium text-foreground truncate">
+                {h.name}
+              </span>
+              <span className="w-14 text-xs font-mono text-muted-foreground">
+                {h.ticker}
+              </span>
+              <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary rounded-full transition-all duration-500"
+                  style={{ width: `${(h.weight / maxWeight) * 100}%` }}
+                />
+              </div>
+              <span className="w-12 text-sm font-semibold text-foreground text-right">
+                {h.weight.toFixed(1)}%
+              </span>
+            </div>
+          ))}
+        </div>
+        {remainingHoldings > 0 && (
+          <p className="text-sm text-muted-foreground mt-4">
+            + {remainingHoldings} more holdings
+          </p>
+        )}
+      </motion.div>
+
+      {/* Recent Activity */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
+        className="bg-card border border-border rounded-xl overflow-hidden"
+      >
+        <div className="p-5 sm:p-6 pb-0">
+          <h3 className="text-base font-semibold text-foreground mb-4">
+            Recent Activity
+          </h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="px-5 sm:px-6 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Type
+                </th>
+                <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Amount
+                </th>
+                <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground hidden sm:table-cell">
+                  Wallet
+                </th>
+                <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground text-right pr-5 sm:pr-6">
+                  Time
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {vault.activity.map((a, i) => (
+                <tr key={i} className="border-b border-border/40 last:border-0">
+                  <td className="px-5 sm:px-6 py-3">
+                    <span
+                      className={`inline-flex text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+                        a.type === "Deposit"
+                          ? "bg-ix-green/10 text-ix-green border-ix-green/30"
+                          : "bg-ix-red/10 text-ix-red border-ix-red/30"
+                      }`}
+                    >
+                      {a.type}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-sm font-semibold text-foreground">
+                    {a.amount.toLocaleString()} {a.token}
+                  </td>
+                  <td className="px-3 py-3 text-xs font-mono text-muted-foreground hidden sm:table-cell">
+                    {a.user}
+                  </td>
+                  <td className="px-3 py-3 text-xs text-muted-foreground text-right pr-5 sm:pr-6">
+                    {a.time}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </motion.div>
+    </>
+  );
 }
+
+/* ─── Overview Tab ─── */
+function OverviewTab({
+  vault,
+}: {
+  vault: NonNullable<ReturnType<typeof vaults.find>>;
+}) {
+  const metadata = [
+    { label: "Inception Date", value: vault.inceptionDate },
+    { label: "Rebalance Frequency", value: vault.rebalance },
+    { label: "Management Fee", value: `${vault.fee}%` },
+    { label: "Oracle Provider", value: vault.oracle },
+    { label: "Smart Contract", value: vault.contract, mono: true },
+    { label: "Blockchain", value: vault.blockchain },
+    { label: "Accepted Tokens", value: vault.acceptedTokens.join(", ") },
+    { label: "Total Holdings", value: vault.totalHoldings.toString() },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="bg-card border border-border rounded-xl p-6"
+    >
+      <h3 className="text-base font-semibold text-foreground mb-3">
+        About this Vault
+      </h3>
+      <p className="text-muted-foreground leading-7 mb-8">
+        {vault.description}
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-8">
+        {metadata.map((m) => (
+          <div key={m.label}>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-1">
+              {m.label}
+            </p>
+            <p
+              className={`text-sm font-semibold text-foreground ${
+                m.mono ? "font-mono text-xs" : ""
+              }`}
+            >
+              {m.value}
+            </p>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+/* ─── Stat Cell ─── */
+function StatCell({
+  label,
+  value,
+  colored,
+  positive,
+}: {
+  label: string;
+  value: string;
+  colored?: boolean;
+  positive?: boolean;
+}) {
+  return (
+    <div className="p-4 sm:p-5">
+      <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-1">
+        {label}
+      </p>
+      <p
+        className={`text-xl font-bold ${
+          colored
+            ? positive
+              ? "text-ix-green"
+              : "text-ix-red"
+            : "text-foreground"
+        }`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+/* ─── Deposit/Withdraw Panel ─── */
+function DepositWithdrawPanel({
+  vault,
+  panelTab,
+  setPanelTab,
+  amount,
+  setAmount,
+  selectedToken,
+  setSelectedToken,
+  isProcessing,
+  isConnected,
+  onConnect,
+  onSubmit,
+  fillAmount,
+}: {
+  vault: NonNullable<ReturnType<typeof vaults.find>>;
+  panelTab: PanelTab;
+  setPanelTab: (t: PanelTab) => void;
+  amount: string;
+  setAmount: (v: string) => void;
+  selectedToken: string;
+  setSelectedToken: (v: string) => void;
+  isProcessing: boolean;
+  isConnected: boolean;
+  onConnect: () => void;
+  onSubmit: () => void;
+  fillAmount: (pct: number) => void;
+}) {
+  const [showTokenSelect, setShowTokenSelect] = useState(false);
+
+  return (
+    <div className="bg-card border border-border rounded-xl overflow-hidden">
+      <div className="glow-line h-px" />
+      {/* Tabs */}
+      <div className="flex border-b border-border">
+        {(["deposit", "withdraw"] as PanelTab[]).map((t) => (
+          <button
+            key={t}
+            onClick={() => setPanelTab(t)}
+            className={`flex-1 py-3 text-sm font-semibold text-center transition-colors border-b-2 ${
+              panelTab === t
+                ? "bg-card text-primary border-primary"
+                : "bg-panel-bg text-muted-foreground border-transparent hover:text-foreground"
+            }`}
+          >
+            {t === "deposit" ? "Deposit" : "Withdraw"}
+          </button>
+        ))}
+      </div>
+
+      <div className="p-5">
+        {/* Amount Input */}
+        <div className="border border-border rounded-lg flex items-stretch focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition-all">
+          <input
+            type="number"
+            placeholder="0.00"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="flex-1 bg-transparent text-lg font-semibold text-foreground px-4 py-3 outline-none placeholder:text-muted-foreground [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+          {panelTab === "deposit" ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowTokenSelect(!showTokenSelect)}
+                className="border-l border-border bg-panel-bg px-3 flex items-center gap-1.5 text-sm font-semibold text-foreground h-full"
+              >
+                <div className="w-4 h-4 rounded-full bg-primary" />
+                {selectedToken}
+                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+              {showTokenSelect && (
+                <div className="absolute top-full right-0 mt-1 bg-card border border-border rounded-lg shadow-xl z-10 min-w-25">
+                  {vault.acceptedTokens.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => {
+                        setSelectedToken(t);
+                        setShowTokenSelect(false);
+                      }}
+                      className="w-full px-3 py-2 text-sm text-foreground hover:bg-muted text-left"
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="border-l border-border bg-panel-bg px-3 flex items-center text-sm font-semibold text-foreground">
+              ind{vault.abbr}
+            </div>
+          )}
+        </div>
+
+        <p className="text-xs text-muted-foreground mt-2">
+          Balance: 10,000.00{" "}
+          {panelTab === "deposit" ? selectedToken : `ind${vault.abbr}`}
+        </p>
+
+        {/* Quick Fill */}
+        <div className="flex gap-2 mt-3">
+          {[0.25, 0.5, 0.75, 1].map((pct) => (
+            <button
+              key={pct}
+              onClick={() => fillAmount(pct)}
+              className="border border-border rounded-md px-2.5 py-1 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary hover:bg-accent transition-colors"
+            >
+              {pct === 1 ? "MAX" : `${pct * 100}%`}
+            </button>
+          ))}
+        </div>
+
+        <div className="h-px bg-border my-4" />
+
+        {/* Summary */}
+        <div className="bg-panel-bg rounded-lg p-3 space-y-2.5">
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">You receive</span>
+            <span className="font-semibold text-foreground">
+              {amount
+                ? panelTab === "deposit"
+                  ? `${(parseFloat(amount) / vault.nav).toFixed(4)} ind${vault.abbr}`
+                  : `${(parseFloat(amount) * vault.nav).toFixed(2)} USDC`
+                : "—"}
+            </span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">NAV per Token</span>
+            <span className="font-semibold text-foreground">
+              {formatNav(vault.nav)}
+            </span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Annual Fee</span>
+            <span className="font-semibold text-foreground">{vault.fee}%</span>
+          </div>
+          {panelTab === "deposit" && (
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Est. 1Y Return</span>
+              <span className="font-semibold text-ix-green">
+                {formatReturn(vault.return1y)}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* CTA */}
+        {isConnected ? (
+          <button
+            onClick={onSubmit}
+            disabled={isProcessing || !amount || parseFloat(amount) <= 0}
+            className={`w-full py-3 rounded-lg font-semibold text-sm mt-4 transition-colors flex items-center justify-center gap-2 ${
+              panelTab === "deposit"
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-foreground text-background hover:bg-foreground/90"
+            } disabled:opacity-70 disabled:cursor-not-allowed`}
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Processing...
+              </>
+            ) : panelTab === "deposit" ? (
+              "Deposit"
+            ) : (
+              "Withdraw"
+            )}
+          </button>
+        ) : (
+          <button
+            onClick={onConnect}
+            className="w-full py-3 rounded-lg font-semibold text-sm mt-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            Connect Wallet
+          </button>
+        )}
+
+        <p className="text-xs text-center text-muted-foreground mt-3">
+          Smart contract audited. Funds deployed on-chain.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Position Panel ─── */
+function PositionPanel({
+  vault,
+  isConnected,
+  address,
+  onConnect,
+}: {
+  vault: NonNullable<ReturnType<typeof vaults.find>>;
+  isConnected: boolean;
+  address?: string;
+  onConnect: () => void;
+}) {
+  return (
+    <div className="bg-card border border-border rounded-xl overflow-hidden">
+      <div className="glow-line h-px" />
+      <div className="p-5">
+        <h3 className="text-sm font-semibold text-foreground mb-4">
+          Your Position
+        </h3>
+        {isConnected && address ? (
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Wallet</span>
+              <span className="font-mono text-xs text-foreground">
+                {address.slice(0, 6)}...{address.slice(-4)}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">
+                ind{vault.abbr} Balance
+              </span>
+              <span className="font-semibold text-foreground">1,234.5678</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">USD Value</span>
+              <span className="font-semibold text-foreground">
+                ${(1234.5678 * vault.nav).toFixed(2)}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center py-6 text-center">
+            <Wallet className="w-8 h-8 text-muted-foreground mb-3" />
+            <p className="text-sm text-muted-foreground mb-4">
+              Connect your wallet to view your position
+            </p>
+            <button
+              onClick={onConnect}
+              className="bg-primary text-primary-foreground px-5 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors"
+            >
+              Connect Wallet
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default VaultDetail;
